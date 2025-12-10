@@ -1,0 +1,26 @@
+package K23cnt3.nht.project3.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Table(name = "nhacungcap")
+@Data
+public class Nhacungcap {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaNCC")
+    private Integer maNCC;
+
+    @Column(name = "TenNCC", nullable = false, length = 100)
+    private String tenNCC;
+
+    @Column(name = "DiaChi", length = 255)
+    private String diaChi;
+
+    @Column(name = "DienThoai", length = 20)
+    private String dienThoai;
+
+    @Column(name = "Email", length = 50)
+    private String email;
+}

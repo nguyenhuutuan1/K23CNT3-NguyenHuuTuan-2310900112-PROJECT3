@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Chi tiết loại sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${title}">Chi tiết loại sản phẩm</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Mã loại:</th>
+                            <td th:text="${loaisanpham.maLoai}"></td>
+                        </tr>
+                        <tr>
+                            <th>Tên loại:</th>
+                            <td th:text="${loaisanpham.tenLoai}" class="fw-bold"></td>
+                        </tr>
+                        <tr>
+                            <th>Số sản phẩm:</th>
+                            <td>
+                                <span class="badge bg-info" th:text="${sanphamCount != null ? sanphamCount : 'Đang tải...'}"></span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Thao tác</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/loaisanpham/edit/{id}(id=${loaisanpham.maLoai})}" class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Chỉnh sửa
+                                </a>
+                                <a th:href="@{/sanpham}" class="btn btn-info">
+                                    <i class="bi bi-box"></i> Xem sản phẩm
+                                </a>
+                                <a href="/loaisanpham" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
