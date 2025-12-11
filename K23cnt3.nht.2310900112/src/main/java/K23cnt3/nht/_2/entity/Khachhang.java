@@ -1,13 +1,16 @@
 package K23cnt3.nht._2.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "khachhang")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Khachhang {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaKH")

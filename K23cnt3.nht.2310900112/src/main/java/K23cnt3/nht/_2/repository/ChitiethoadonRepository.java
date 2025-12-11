@@ -10,13 +10,13 @@ import java.util.List;
 @Repository
 public interface ChitiethoadonRepository extends JpaRepository<Chitiethoadon, Integer> {
 
-    List<Chitiethoadon> findByHoaDon_MaHD(Integer maHD);
+    List<Chitiethoadon> findByHoadon_MaHD(Integer maHD);
 
-    List<Chitiethoadon> findBySanPham_MaSP(Integer maSP);
+    List<Chitiethoadon> findBySanpham_MaSP(Integer maSP);
 
-    @Query("SELECT c FROM Chitiethoadon c WHERE c.hoaDon.maHD = :maHD")
-    List<Chitiethoadon> findChiTietByHoaDonId(@Param("maHD") Integer maHD);
+    @Query("SELECT c FROM Chitiethoadon c WHERE c.hoadon.maHD = :maHD")
+    List<Chitiethoadon> findChiTietByMaHD(@Param("maHD") Integer maHD);
 
-    @Query("SELECT SUM(c.soLuong) FROM Chitiethoadon c WHERE c.sanPham.maSP = :maSP")
-    Integer tongSoLuongDaBan(@Param("maSP") Integer maSP);
+    @Query("SELECT c.sanpham.maSP, SUM(c.soLuong) FROM Chitiethoadon c GROUP BY c.sanpham.maSP ORDER BY SUM(c.soLuong) DESC")
+    List<Object[]> findSanPhamBanChay();
 }

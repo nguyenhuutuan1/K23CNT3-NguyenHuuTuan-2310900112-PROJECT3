@@ -1,36 +1,12 @@
 package K23cnt3.nht._2.service;
 
 import K23cnt3.nht._2.entity.Loaisanpham;
-import K23cnt3.nht._2.repository.LoaisanphamRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class LoaisanphamService {
-
-    @Autowired
-    private LoaisanphamRepository loaisanphamRepository;
-
-    public List<Loaisanpham> getAllLoaisanpham() {
-        return loaisanphamRepository.findAll();
-    }
-
-    public Loaisanpham getLoaisanphamById(Integer id) {
-        Optional<Loaisanpham> optional = loaisanphamRepository.findById(id);
-        return optional.orElse(null);
-    }
-
-    public Loaisanpham saveLoaisanpham(Loaisanpham loaisanpham) {
-        return loaisanphamRepository.save(loaisanpham);
-    }
-
-    public void deleteLoaisanpham(Integer id) {
-        loaisanphamRepository.deleteById(id);
-    }
-
-    public List<Loaisanpham> searchLoaisanpham(String keyword) {
-        return loaisanphamRepository.findByTenLoaiContaining(keyword);
-    }
+public interface LoaisanphamService {
+    List<Loaisanpham> getAllLoaisanpham();
+    Optional<Loaisanpham> getLoaisanphamById(Integer id);
+    Loaisanpham saveLoaisanpham(Loaisanpham loaisanpham);
+    void deleteLoaisanpham(Integer id);
 }

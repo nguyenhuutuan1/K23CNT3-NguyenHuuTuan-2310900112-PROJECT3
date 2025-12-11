@@ -1,14 +1,17 @@
 package K23cnt3.nht._2.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "nhanvien")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Nhanvien {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaNV")

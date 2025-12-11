@@ -1,13 +1,16 @@
 package K23cnt3.nht._2.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "chitiethoadon")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Chitiethoadon {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaCTHD")
@@ -15,11 +18,11 @@ public class Chitiethoadon {
 
     @ManyToOne
     @JoinColumn(name = "MaHD")
-    private Hoadon hoaDon;
+    private Hoadon hoadon;
 
     @ManyToOne
     @JoinColumn(name = "MaSP")
-    private Sanpham sanPham;
+    private Sanpham sanpham;
 
     @Column(name = "SoLuong")
     private Integer soLuong;
@@ -29,11 +32,4 @@ public class Chitiethoadon {
 
     @Column(name = "ThanhTien", precision = 18, scale = 2)
     private BigDecimal thanhTien;
-
-    // ĐỔI TỪ PRIVATE SANG PUBLIC
-    public void calculateThanhTien() {
-        if (donGia != null && soLuong != null) {
-            thanhTien = donGia.multiply(BigDecimal.valueOf(soLuong));
-        }
-    }
 }

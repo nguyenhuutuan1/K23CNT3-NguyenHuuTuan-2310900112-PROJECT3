@@ -11,15 +11,18 @@ import java.util.List;
 @Repository
 public interface HoadonRepository extends JpaRepository<Hoadon, Integer> {
 
+    List<Hoadon> findByKhachhang_MaKH(Integer maKH);
+
+    List<Hoadon> findByNhanvien_MaNV(Integer maNV);
+
     List<Hoadon> findByTrangThai(String trangThai);
 
-    List<Hoadon> findByNgayLapHDBetween(LocalDate startDate, LocalDate endDate);
+    List<Hoadon> findByNgayLapHD(LocalDate ngayLapHD);
 
-    List<Hoadon> findByKhachHang_MaKH(Integer maKH);
+    @Query("SELECT h FROM Hoadon h WHERE h.ngayLapHD BETWEEN :startDate AND :endDate")
+    List<Hoadon> findHoaDonBetweenDates(@Param("startDate") LocalDate startDate,
+                                        @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT SUM(h.tongTien) FROM Hoadon h WHERE h.ngayLapHD = :date AND h.trangThai = 'Đã thanh toán'")
-    Double getDoanhThuNgay(@Param("date") LocalDate date);
-
-    @Query("SELECT COUNT(h) FROM Hoadon h WHERE h.ngayLapHD = :date")
-    Integer countHoaDonByNgay(@Param("date") LocalDate date);
+    @Query("SELECT SUM(h.tongTien) FROM Hoadon h WHERE h.trangThai = 'Đã thanh toán'")
+    Double tongDoanhThu();
 }

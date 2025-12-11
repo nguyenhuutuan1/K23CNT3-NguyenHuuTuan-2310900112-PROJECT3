@@ -1,12 +1,15 @@
 package K23cnt3.nht._2.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
 @Table(name = "nhacungcap")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Nhacungcap {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaNCC")

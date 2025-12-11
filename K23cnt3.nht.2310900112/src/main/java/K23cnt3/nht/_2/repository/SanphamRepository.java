@@ -12,13 +12,13 @@ public interface SanphamRepository extends JpaRepository<Sanpham, Integer> {
 
     List<Sanpham> findByTenSPContaining(String tenSP);
 
-    List<Sanpham> findByLoaiSanPham_MaLoai(Integer maLoai);
+    List<Sanpham> findByLoaisanpham_MaLoai(Integer maLoai);
 
-    List<Sanpham> findBySoLuongGreaterThan(Integer soLuong);
+    List<Sanpham> findByNhacungcap_MaNCC(Integer maNCC);
 
-    @Query("SELECT s FROM Sanpham s WHERE s.donGia BETWEEN :min AND :max")
-    List<Sanpham> findByDonGiaBetween(@Param("min") Double min, @Param("max") Double max);
+    @Query("SELECT s FROM Sanpham s WHERE s.soLuong > 0 ORDER BY s.maSP DESC")
+    List<Sanpham> findSanPhamConHang();
 
-    @Query("SELECT s FROM Sanpham s WHERE s.nhaCungCap.maNCC = :maNCC")
-    List<Sanpham> findByNhaCungCap(@Param("maNCC") Integer maNCC);
+    @Query("SELECT s FROM Sanpham s WHERE s.tenSP LIKE %:keyword% OR s.moTa LIKE %:keyword%")
+    List<Sanpham> timKiemSanPham(@Param("keyword") String keyword);
 }

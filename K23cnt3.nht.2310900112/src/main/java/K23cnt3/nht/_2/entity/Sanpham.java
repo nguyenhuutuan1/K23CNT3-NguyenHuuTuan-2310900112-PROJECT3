@@ -1,13 +1,16 @@
 package K23cnt3.nht._2.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "sanpham")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Sanpham {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaSP")
@@ -18,11 +21,11 @@ public class Sanpham {
 
     @ManyToOne
     @JoinColumn(name = "MaLoai")
-    private Loaisanpham loaiSanPham;
+    private Loaisanpham loaisanpham;
 
     @ManyToOne
     @JoinColumn(name = "MaNCC")
-    private Nhacungcap nhaCungCap;
+    private Nhacungcap nhacungcap;
 
     @Column(name = "DonViTinh", length = 20)
     private String donViTinh;
