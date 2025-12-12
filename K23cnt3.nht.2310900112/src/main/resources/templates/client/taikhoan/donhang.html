@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/client-layout}">
+<head>
+    <title>Đơn hàng của tôi</title>
+
+    <th:block layout:fragment="styles">
+        <style>
+            .orders-container {
+                min-height: 600px;
+            }
+            .order-filter {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+            .filter-btn-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .filter-btn {
+                padding: 8px 20px;
+                border-radius: 20px;
+                border: 1px solid #dee2e6;
+                background: white;
+                transition: all 0.3s;
+            }
+            .filter-btn:hover, .filter-btn.active {
+                background: #28a745;
+                color: white;
+                border-color: #28a745;
+            }
+            .order-card {
+                border: 1px solid #dee2e6;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                overflow: hidden;
+                transition: all 0.3s;
+            }
+            .order-card:hover {
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+            }
+            .order-header {
+                background: #f8f9fa;
+                padding: 15px 20px;
+                border-bottom: 1px solid #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .order-body {
+                padding: 20px;
+            }
+            .order-item {
+                display: flex;
+                align-items: center;
+                padding: 15px 0;
+                border-bottom: 1px solid #f8f9fa;
+            }
+            .order-item:last-child {
+                border-bottom: none;
+            }
+            .product-image {
+                width: 80px;
+                height: 80px;
+                object-fit: contain;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                margin-right: 15px;
+                padding: 5px;
+                background: white;
+            }
+            .product-info {
+                flex: 1;
+            }
+            .order-footer {
+                background: #f8fff9;
+                padding: 15px 20px;
+                border-top: 1px solid #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .order-status {
+                padding: 6px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+            .status-confirmed {
+                background: #cce5ff;
+                color: #004085;
+            }
+            .status-processing {
+                background: #d1ecf1;
+                color: #0c5460;
+            }
+            .status-shipping {
+                background: #d4edda;
+                color: #155724;
+            }
+            .status-delivered {
+                background: #d4edda;
+                color: #155724;
+            }
+            .status-cancelled {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            .status-refunded {
+                background: #e2e3e5;
+                color: #383d41;
+            }
+            .tracking-steps {
+                display: flex;
+                justify-content: space-between;
+                margin: 20px 0;
+                position: relative;
+            }
+            .tracking-steps::before {
+                content: '';
+                position: absolute;
+                top: 15px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: #e9ecef;
+                z-index: 1;
+            }
+            .tracking-step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                z-index: 2;
+                flex: 1;
+            }
+            .step-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: #e9ecef;
+                color: #6c757d;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 8px;
+            }
+            .tracking-step.active .step-icon {
+                background: #28a745;
+                color: white;
+            }
+            .tracking-step.completed .step-icon {
+                background: #20c997;
+                color: white;
+            }
+            .step-label {
+                font-size: 0.8rem;
+                color: #6c757d;
+                text-align: center;
+            }
+            .tracking-step.active .step-label {
+                color: #28a745;
+                font-weight: bold;
+            }
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+            }
+            .empty-orders {
+                text-align: center;
+                padding: 80px 0;
+            }
+            .order-total {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #28a745;
+            }
+            .search-box {
+                max-width: 400px;
+            }
+            .pagination-container {
+                margin-top: 30px;
+            }
+            .order-code {
+                font-family: monospace;
+                background: #e9ecef;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 0.9rem;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Breadcrumb -->
+    <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/profile}">Hồ sơ</a></li>
+                <li class="breadcrumb-item active">Đơn hàng của tôi</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Orders Content -->
+    <div class="container py-4 orders-container">
+        <h2 class="mb-4">
+            <i class="fas fa-clipboard-list me-2"></i>Đơn hàng của tôi
+        </h2>
+
+        <!-- Order Filter -->
+        <div class="order-filter">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5 class="mb-3">Lọc đơn hàng</h5>
+                    <div class="filter-btn-group">
+                        <button class="filter-btn active" onclick="filterOrders('all')">Tất cả</button>
+                        <button class="filter-btn" onclick="filterOrders('pending')">Chờ xác nhận</button>
+                        <button class="filter-btn" onclick="filterOrders('processing')">Đang xử lý</button>
+                        <button class="filter-btn" onclick="filterOrders('shipping')">Đang giao hàng</button>
+                        <button class="filter-btn" onclick="filterOrders('delivered')">Đã giao</button>
+                        <button class="filter-btn" onclick="filterOrders('cancelled')">Đã hủy</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="search-box">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="orderSearch"
+                                   placeholder="Tìm kiếm theo mã đơn hàng...">
+                            <button class="btn btn-outline-success" type="button" onclick="searchOrders()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Filter -->
+            <div class="row mt-3">
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <input type="date" class="form-control" id="fromDate" placeholder="Từ ngày">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <input type="date" class="form-control" id="toDate" placeholder="Đến ngày">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-success w-100" onclick="applyDateFilter()">
+                                <i class="fas fa-filter me-1"></i>Lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="text-muted" th:text="'Tổng: ' + ${totalOrders} + ' đơn hàng'">
+                        Tổng: 12 đơn hàng
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div id="ordersList">
+            <!-- Order Cards -->
+            <div th:each="order : ${orders}" class="order-card" th:data-status="${order.status}">
+                <!-- Order Header -->
+                <div class="order-header">
+                    <div>
+                        <strong>Đơn hàng: <span class="order-code" th:text="${order.code}">DH0012301</span></strong>
+                        <small class="text-muted ms-3"
+                               th:text="${#dates.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">
+                            15/01/2023 14:30
+                        </small>
+                    </div>
+                    <div>
+                        <span class="order-status" th:class="${'status-' + order.status}">
+                            <span th:text="${order.statusText}">Đang xử lý</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Order Body -->
+                <div class="order-body">
+                    <!-- Order Items -->
+                    <div th:each="item : ${order.items}">
+                        <div class="order-item">
+                            <img th:src="@{${item.productImage != null ? item.productImage : '/images/no-image.png'}}"
+                                 class="product-image" alt="Product">
+                            <div class="product-info">
+                                <h6 th:text="${item.productName}">Tên sản phẩm</h6>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <small class="text-muted" th:text="'Số lượng: ' + ${item.quantity}">
+                                            Số lượng: 2
+                                        </small>
+                                        <small class="text-muted ms-3"
+                                               th:text="'Đơn giá: ' + ${#numbers.formatCurrency(item.unitPrice)}">
+                                            Đơn giá: 50,000 đ
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <strong th:text="${#numbers.formatCurrency(item.totalPrice)}">
+                                            100,000 đ
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tracking Steps (for shipping orders) -->
+                    <div th:if="${order.status == 'SHIPPING' or order.status == 'DELIVERED'}">
+                        <h6 class="mt-4 mb-3"><i class="fas fa-truck me-2"></i>Theo dõi đơn hàng</h6>
+                        <div class="tracking-steps">
+                            <div class="tracking-step completed">
+                                <div class="step-icon">
+                                    <i class="fas fa-clipboard-check"></i>
+                                </div>
+                                <div class="step-label">Đã xác nhận</div>
+                            </div>
+                            <div class="tracking-step completed">
+                                <div class="step-icon">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="step-label">Đóng gói</div>
+                            </div>
+                            <div class="tracking-step" th:classappend="${order.status == 'SHIPPING' ? 'active' : 'completed'}">
+                                <div class="step-icon">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <div class="step-label">Đang vận chuyển</div>
+                            </div>
+                            <div class="tracking-step" th:classappend="${order.status == 'DELIVERED' ? 'completed' : ''}">
+                                <div class="step-icon">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div class="step-label">Đã giao hàng</div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Info -->
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Đơn vị vận chuyển:</small>
+                                    <div th:text="${order.shippingCarrier}">GHTK</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Mã vận đơn:</small>
+                                    <div th:text="${order.trackingNumber}">GH123456789</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Footer -->
+                <div class="order-footer">
+                    <div>
+                        <span class="text-muted">Tổng cộng:</span>
+                        <span class="order-total ms-2" th:text="${#numbers.formatCurrency(order.total)}">
+                            450,000 đ
+                        </span>
+                        <small class="text-muted ms-3" th:if="${order.discount > 0}"
+                               th:text="'Đã giảm: ' + ${#numbers.formatCurrency(order.discount)}">
+                            Đã giảm: 50,000 đ
+                        </small>
+                    </div>
+
+                    <div class="action-buttons">
+                        <!-- View Details -->
+                        <a th:href="@{/order/{id}(id=${order.id})}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-eye me-1"></i>Chi tiết
+                        </a>
+
+                        <!-- Track Order -->
+                        <a th:if="${order.trackingNumber != null and order.status == 'SHIPPING'}"
+                           th:href="@{https://tracking.giaohangtietkiem.vn/${order.trackingNumber}}"
+                           target="_blank" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-truck me-1"></i>Theo dõi
+                        </a>
+
+                        <!-- Reorder -->
+                        <button class="btn btn-outline-primary btn-sm"
+                                th:onclick="'reorder(' + ${order.id} + ')'">
+                            <i class="fas fa-redo me-1"></i>Mua lại
+                        </button>
+
+                        <!-- Cancel Order -->
+                        <button th:if="${order.status == 'PENDING' or order.status == 'CONFIRMED'}"
+                                class="btn btn-outline-danger btn-sm"
+                                th:onclick="'cancelOrder(' + ${order.id} + ')'">
+                            <i class="fas fa-times me-1"></i>Hủy đơn
+                        </button>
+
+                        <!-- Review Order -->
+                        <button th:if="${order.status == 'DELIVERED' and not order.reviewed}"
+                                class="btn btn-outline-warning btn-sm"
+                                th:onclick="'reviewOrder(' + ${order.id} + ')'">
+                            <i class="fas fa-star me-1"></i>Đánh giá
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${orders == null or orders.empty}" class="empty-orders">
+                <i class="fas fa-clipboard-list fa-4x text-muted mb-4"></i>
+                <h3 class="mb-3">Chưa có đơn hàng nào</h3>
+                <p class="text-muted mb-4">Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+                <a th:href="@{/products}" class="btn btn-success btn-lg">
+                    <i class="fas fa-store me-2"></i>Mua sắm ngay
+                </a>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" th:if="${totalPages > 1}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/orders?page={page}(page=${currentPage - 1})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <li th:each="page : ${#numbers.sequence(max(1, currentPage-2), min(totalPages, currentPage+2))}"
+                        class="page-item" th:classappend="${page == currentPage ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/orders?page={page}(page=${page})}"
+                           th:text="${page}">1</a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/orders?page={page}(page=${currentPage + 1})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hủy đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn hủy đơn hàng này?</p>
+                <div class="mb-3">
+                    <label class="form-label">Lý do hủy (không bắt buộc)</label>
+                    <select class="form-select" id="cancelReason">
+                        <option value="">Chọn lý do</option>
+                        <option value="CHANGE_MIND">Thay đổi ý định mua hàng</option>
+                        <option value="FOUND_CHEAPER">Tìm thấy nơi bán rẻ hơn</option>
+                        <option value="TOO_LONG_SHIPPING">Thời gian giao hàng quá lâu</option>
+                        <option value="OTHER">Lý do khác</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="otherReasonDiv" style="display: none;">
+                    <textarea class="form-control" id="otherReason" rows="3"
+                              placeholder="Nhập lý do khác..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancelOrder()">Xác nhận hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        let currentOrderId = null;
+
+        // Filter orders by status
+        function filterOrders(status) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide orders based on status
+            const orders = document.querySelectorAll('.order-card');
+
+            if (status === 'all') {
+                orders.forEach(order => {
+                    order.style.display = 'block';
+                });
+            } else {
+                orders.forEach(order => {
+                    const orderStatus = order.getAttribute('data-status');
+                    if (orderStatus === status) {
+                        order.style.display = 'block';
+                    } else {
+                        order.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Search orders
+        function searchOrders() {
+            const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+            const orders = document.querySelectorAll('.order-card');
+
+            if (!searchTerm) {
+                orders.forEach(order => {
+                    order.style.display = 'block';
+                });
+                return;
+            }
+
+            orders.forEach(order => {
+                const orderCode = order.querySelector('.order-code').textContent.toLowerCase();
+                if (orderCode.includes(searchTerm)) {
+                    order.style.display = 'block';
+                } else {
+                    order.style.display = 'none';
+                }
+            });
+        }
+
+        // Apply date filter
+        function applyDateFilter() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            // In real app, this would make an API call
+            // For demo, we'll just show an alert
+            if (fromDate || toDate) {
+                alert('Lọc đơn hàng theo ngày từ ' + fromDate + ' đến ' + toDate);
+            }
+        }
+
+        // Cancel order
+        function cancelOrder(orderId) {
+            currentOrderId = orderId;
+            const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+            modal.show();
+
+            // Show/hide other reason textarea
+            document.getElementById('cancelReason').addEventListener('change', function() {
+                const otherReasonDiv = document.getElementById('otherReasonDiv');
+                if (this.value === 'OTHER') {
+                    otherReasonDiv.style.display = 'block';
+                } else {
+                    otherReasonDiv.style.display = 'none';
+                }
+            });
+        }
+
+        // Confirm cancel order
+        function confirmCancelOrder() {
+            const reason = document.getElementById('cancelReason').value;
+            const otherReason = document.getElementById('otherReason').value;
+            const cancelReason = reason === 'OTHER' ? otherReason : reason;
+
+            fetch(`/api/orders/${currentOrderId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: JSON.stringify({ reason: cancelReason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('cancelOrderModal'));
+                    modal.hide();
+
+                    // Reload page
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra');
+            });
+        }
+
+        // Reorder
+        function reorder(orderId) {
+            if (confirm('Bạn có muốn mua lại các sản phẩm trong đơn hàng này?')) {
+                fetch(`/api/orders/${orderId}/reorder`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to cart
+                        window.location.href = '/cart';
+                    } else {
+                        alert('Có lỗi xảy ra: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra');
+                });
+            }
+        }
+
+        // Review order
+        function reviewOrder(orderId) {
+            window.location.href = `/order/${orderId}/review`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add Enter key support for search
+            document.getElementById('orderSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchOrders();
+                }
+            });
+
+            // Set default date range (last 30 days)
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+
+            document.getElementById('fromDate').valueAsDate = thirtyDaysAgo;
+            document.getElementById('toDate').valueAsDate = today;
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

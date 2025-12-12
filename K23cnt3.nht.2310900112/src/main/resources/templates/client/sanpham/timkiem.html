@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/client-layout}">
+<head>
+    <title>Tìm kiếm sản phẩm</title>
+
+    <th:block layout:fragment="styles">
+        <style>
+            .search-header {
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+            }
+            .search-box {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            .search-tabs .nav-link {
+                color: #495057;
+                border: none;
+                padding: 10px 20px;
+            }
+            .search-tabs .nav-link.active {
+                color: #28a745;
+                border-bottom: 3px solid #28a745;
+                background: transparent;
+            }
+            .filter-tag {
+                display: inline-flex;
+                align-items: center;
+                background: #e9ecef;
+                border-radius: 20px;
+                padding: 5px 15px;
+                margin: 5px;
+            }
+            .filter-tag .close {
+                margin-left: 8px;
+                cursor: pointer;
+            }
+            .result-count {
+                color: #6c757d;
+            }
+            .no-results {
+                padding: 100px 0;
+                text-align: center;
+                color: #6c757d;
+            }
+            .suggestion-item {
+                padding: 8px 15px;
+                border-bottom: 1px solid #eee;
+                cursor: pointer;
+            }
+            .suggestion-item:hover {
+                background: #f8f9fa;
+            }
+            .search-history {
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            .trending-search {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 15px;
+            }
+            .trending-item {
+                display: inline-block;
+                margin: 5px;
+                padding: 5px 15px;
+                background: white;
+                border-radius: 20px;
+                border: 1px solid #dee2e6;
+                cursor: pointer;
+            }
+            .trending-item:hover {
+                background: #e9ecef;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Search Header -->
+    <div class="search-header py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="text-center mb-4">Tìm kiếm sản phẩm</h1>
+
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <div class="input-group input-group-lg">
+                            <input type="text" class="form-control" id="searchInput"
+                                   placeholder="Nhập tên sản phẩm bạn muốn tìm..."
+                                   th:value="${keyword != null ? keyword : ''}"
+                                   onkeyup="showSuggestions()"
+                                   autocomplete="off">
+                            <button class="btn btn-light" type="button" onclick="performSearch()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+
+                        <!-- Search Suggestions -->
+                        <div id="searchSuggestions" class="position-absolute w-100 bg-white shadow rounded mt-1 d-none"
+                             style="z-index: 1000; max-height: 300px; overflow-y: auto;">
+                            <!-- Suggestions will be populated here -->
+                        </div>
+
+                        <!-- Search Tabs -->
+                        <div class="search-tabs mt-4">
+                            <ul class="nav nav-tabs justify-content-center border-0">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#" onclick="changeSearchType('products')">
+                                        <i class="fas fa-box me-1"></i>Sản phẩm
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="changeSearchType('categories')">
+                                        <i class="fas fa-tags me-1"></i>Danh mục
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="changeSearchType('brands')">
+                                        <i class="fas fa-trademark me-1"></i>Thương hiệu
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <!-- Search Results Info -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h4 class="mb-3">Kết quả tìm kiếm</h4>
+
+                <!-- Active Filters -->
+                <div id="activeFilters" th:if="${hasFilters}">
+                    <small class="text-muted me-2">Bộ lọc đang áp dụng:</small>
+                    <div class="d-inline-flex flex-wrap">
+                        <span class="filter-tag" th:if="${keyword != null and not #strings.isEmpty(keyword)}">
+                            Từ khóa: "<span th:text="${keyword}"></span>"
+                            <span class="close" onclick="removeFilter('keyword')">&times;</span>
+                        </span>
+                        <span class="filter-tag" th:if="${category != null}">
+                            Danh mục: <span th:text="${category.name}"></span>
+                            <span class="close" onclick="removeFilter('category')">&times;</span>
+                        </span>
+                        <span class="filter-tag" th:if="${minPrice != null}">
+                            Giá từ: <span th:text="${#numbers.formatCurrency(minPrice)}"></span>
+                            <span class="close" onclick="removeFilter('minPrice')">&times;</span>
+                        </span>
+                        <span class="filter-tag" th:if="${maxPrice != null}">
+                            Giá đến: <span th:text="${#numbers.formatCurrency(maxPrice)}"></span>
+                            <span class="close" onclick="removeFilter('maxPrice')">&times;</span>
+                        </span>
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearAllFilters()">
+                            <i class="fas fa-times me-1"></i>Xóa tất cả
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result Count -->
+                <p class="result-count mt-2" th:text="'Tìm thấy ' + ${totalResults} + ' kết quả'">
+                    Tìm thấy 0 kết quả
+                </p>
+            </div>
+
+            <div class="col-md-4 text-end">
+                <div class="dropdown d-inline-block me-3">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown">
+                        <i class="fas fa-sort me-1"></i>Sắp xếp
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="setSort('relevance')">Liên quan nhất</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setSort('newest')">Mới nhất</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setSort('price_asc')">Giá thấp đến cao</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setSort('price_desc')">Giá cao đến thấp</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setSort('popular')">Phổ biến nhất</a></li>
+                    </ul>
+                </div>
+
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary active" onclick="changeView('grid')">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="changeView('list')">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div class="col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Price Range -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Khoảng giá</h6>
+                            <div class="mb-3">
+                                <input type="range" class="form-range" id="priceFilterMin" min="0" max="1000000"
+                                       step="10000" th:value="${minPrice != null ? minPrice : 0}">
+                                <input type="range" class="form-range" id="priceFilterMax" min="0" max="1000000"
+                                       step="10000" th:value="${maxPrice != null ? maxPrice : 1000000}">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span id="priceFilterMinValue">
+                                    <span th:text="${#numbers.formatCurrency(minPrice != null ? minPrice : 0)}">0 đ</span>
+                                </span>
+                                <span id="priceFilterMaxValue">
+                                    <span th:text="${#numbers.formatCurrency(maxPrice != null ? maxPrice : 1000000)}">1,000,000 đ</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Categories -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Danh mục</h6>
+                            <div class="form-check mb-2" th:each="cat : ${categories}">
+                                <input class="form-check-input category-check" type="checkbox"
+                                       th:id="'cat_' + ${cat.id}" th:value="${cat.id}"
+                                       th:checked="${selectedCategories != null and selectedCategories.contains(cat.id)}">
+                                <label class="form-check-label" th:for="'cat_' + ${cat.id}"
+                                       th:text="${cat.name} + ' (' + ${cat.count} + ')'">Category (10)</label>
+                            </div>
+                        </div>
+
+                        <!-- Brands -->
+                        <div class="mb-4" th:if="${brands != null and !brands.empty}">
+                            <h6 class="mb-3">Thương hiệu</h6>
+                            <div class="form-check mb-2" th:each="brand : ${brands}">
+                                <input class="form-check-input brand-check" type="checkbox"
+                                       th:id="'brand_' + ${brand.id}" th:value="${brand.id}"
+                                       th:checked="${selectedBrands != null and selectedBrands.contains(brand.id)}">
+                                <label class="form-check-label" th:for="'brand_' + ${brand.id}"
+                                       th:text="${brand.name} + ' (' + ${brand.count} + ')'">Brand (5)</label>
+                            </div>
+                        </div>
+
+                        <!-- In Stock Only -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="inStockCheck"
+                                       th:checked="${inStockOnly != null and inStockOnly}">
+                                <label class="form-check-label" for="inStockCheck">
+                                    Chỉ hiện sản phẩm còn hàng
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Đánh giá</h6>
+                            <div class="form-check mb-2" th:each="i : ${#numbers.sequence(4, 1, -1)}">
+                                <input class="form-check-input rating-check" type="radio"
+                                       name="ratingFilter" th:id="'rating_' + ${i}"
+                                       th:value="${i}" th:checked="${minRating == i}">
+                                <label class="form-check-label" th:for="'rating_' + ${i}">
+                                    <span th:text="${i} + ' sao trở lên'">4 sao trở lên</span>
+                                    <div class="d-inline-block ms-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <span th:each="j : ${#numbers.sequence(1, i)}">
+                                            <i class="fas fa-star text-warning"></i>
+                                        </span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success w-100" onclick="applySearchFilters()">
+                            <i class="fas fa-filter me-1"></i>Áp dụng bộ lọc
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Trending Searches -->
+                <div class="trending-search mt-4">
+                    <h6><i class="fas fa-fire text-danger me-2"></i>Tìm kiếm phổ biến</h6>
+                    <div class="mt-3">
+                        <span class="trending-item" onclick="searchTrending('Rau sạch')">Rau sạch</span>
+                        <span class="trending-item" onclick="searchTrending('Thịt heo')">Thịt heo</span>
+                        <span class="trending-item" onclick="searchTrending('Nước mắm')">Nước mắm</span>
+                        <span class="trending-item" onclick="searchTrending('Sữa tươi')">Sữa tươi</span>
+                        <span class="trending-item" onclick="searchTrending('Gạo')">Gạo</span>
+                        <span class="trending-item" onclick="searchTrending('Trái cây')">Trái cây</span>
+                    </div>
+                </div>
+
+                <!-- Search History -->
+                <div class="card mt-4" th:if="${searchHistory != null and !searchHistory.empty}">
+                    <div class="card-body">
+                        <h6><i class="fas fa-history me-2"></i>Lịch sử tìm kiếm</h6>
+                        <div class="search-history mt-3">
+                            <div class="suggestion-item" th:each="history : ${searchHistory}"
+                                 th:onclick="'searchHistory(\'' + ${history} + '\')'">
+                                <i class="fas fa-clock text-muted me-2"></i>
+                                <span th:text="${history}">từ khóa</span>
+                                <i class="fas fa-times text-muted ms-2 float-end"
+                                   onclick="removeSearchHistory(event, '[[${history}]]')"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary w-100 mt-2" onclick="clearSearchHistory()">
+                            <i class="fas fa-trash me-1"></i>Xóa lịch sử
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Grid -->
+            <div class="col-lg-9">
+                <!-- No Results -->
+                <div class="no-results" th:if="${products == null or products.empty}">
+                    <i class="fas fa-search fa-4x mb-3"></i>
+                    <h4>Không tìm thấy kết quả phù hợp</h4>
+                    <p class="mb-4" th:if="${keyword != null}">
+                        Không tìm thấy sản phẩm cho từ khóa "<strong th:text="${keyword}"></strong>"
+                    </p>
+                    <div class="mt-4">
+                        <h6>Gợi ý:</h6>
+                        <ul class="text-start d-inline-block">
+                            <li>Kiểm tra lại chính tả</li>
+                            <li>Thử từ khóa ngắn hơn hoặc tổng quát hơn</li>
+                            <li>Tìm kiếm với từ khóa tiếng Việt có dấu</li>
+                            <li>Sử dụng bộ lọc để tìm kiếm chính xác hơn</li>
+                        </ul>
+                    </div>
+                    <div class="mt-4">
+                        <a th:href="@{/products}" class="btn btn-success">
+                            <i class="fas fa-store me-2"></i>Xem tất cả sản phẩm
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="searchResultsView">
+                    <!-- Grid View -->
+                    <div class="row" id="gridView">
+                        <div class="col-md-4 col-sm-6 mb-4" th:each="product : ${products}">
+                            <div class="card h-100">
+                                <a th:href="@{/product/{id}(id=${product.id})}">
+                                    <img th:src="@{${product.imageUrl != null ? product.imageUrl : '/images/no-image.png'}}"
+                                         class="card-img-top" alt="Product"
+                                         style="height: 200px; object-fit: contain; padding: 10px;">
+                                </a>
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <a th:href="@{/product/{id}(id=${product.id})}"
+                                           class="text-decoration-none text-dark"
+                                           th:text="${product.name}">Product Name</a>
+                                    </h6>
+                                    <div class="mb-2">
+                                        <small class="text-warning">
+                                            <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, 5)}"
+                                               th:class="${i <= product.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                        </small>
+                                        <small class="text-muted" th:text="'(' + ${product.reviewCount} + ')'">(10)</small>
+                                    </div>
+                                    <div class="price">
+                                        <span th:text="${#numbers.formatCurrency(product.finalPrice)}">50,000 đ</span>
+                                        <span class="old-price ms-2" th:if="${product.discount > 0}"
+                                              th:text="${#numbers.formatCurrency(product.price)}">62,500 đ</span>
+                                    </div>
+                                    <button class="btn btn-outline-success w-100 mt-2"
+                                            th:onclick="'addToCart(' + ${product.id} + ')'">
+                                        <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List View (Hidden by default) -->
+                    <div class="d-none" id="listView">
+                        <div class="card mb-3" th:each="product : ${products}">
+                            <div class="row g-0">
+                                <div class="col-md-3">
+                                    <a th:href="@{/product/{id}(id=${product.id})}">
+                                        <img th:src="@{${product.imageUrl != null ? product.imageUrl : '/images/no-image.png'}}"
+                                             class="img-fluid rounded-start" alt="Product"
+                                             style="height: 150px; object-fit: contain;">
+                                    </a>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a th:href="@{/product/{id}(id=${product.id})}"
+                                               class="text-decoration-none" th:text="${product.name}">Product Name</a>
+                                        </h5>
+                                        <div class="mb-2">
+                                            <small class="text-warning">
+                                                <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, 5)}"
+                                                   th:class="${i <= product.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                            </small>
+                                            <small class="text-muted" th:text="'(' + ${product.reviewCount} + ')'">(10)</small>
+                                            <small class="text-muted ms-3" th:text="${product.categoryName}">Category</small>
+                                        </div>
+                                        <p class="card-text text-muted small" th:text="${product.shortDescription}">
+                                            Short description...
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="price">
+                                                <h5 class="text-success mb-0"
+                                                    th:text="${#numbers.formatCurrency(product.finalPrice)}">50,000 đ</h5>
+                                                <span class="old-price" th:if="${product.discount > 0}"
+                                                      th:text="${#numbers.formatCurrency(product.price)}">62,500 đ</span>
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-outline-success btn-sm me-2"
+                                                        th:onclick="'addToCart(' + ${product.id} + ')'">
+                                                    <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+                                                </button>
+                                                <a th:href="@{/product/{id}(id=${product.id})}"
+                                                   class="btn btn-success btn-sm">
+                                                    <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Search results pages" class="mt-4" th:if="${totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{${pageUrl + 'page=' + (currentPage - 1)}}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        <li th:each="page : ${#numbers.sequence(max(1, currentPage-2), min(totalPages, currentPage+2))}"
+                            class="page-item" th:classappend="${page == currentPage ? 'active' : ''}">
+                            <a class="page-link" th:href="@{${pageUrl + 'page=' + page}}" th:text="${page}">1</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{${pageUrl + 'page=' + (currentPage + 1)}}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        let currentSearchType = 'products';
+
+        // Perform search
+        function performSearch() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            const url = new URL('/search', window.location.origin);
+
+            if (keyword) {
+                url.searchParams.set('keyword', keyword);
+            }
+
+            url.searchParams.set('type', currentSearchType);
+            window.location.href = url.toString();
+        }
+
+        // Change search type
+        function changeSearchType(type) {
+            currentSearchType = type;
+            document.querySelectorAll('.search-tabs .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // If there's a keyword, perform search with new type
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (keyword) {
+                performSearch();
+            }
+        }
+
+        // Show search suggestions
+        function showSuggestions() {
+            const input = document.getElementById('searchInput');
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+
+            if (input.value.length < 2) {
+                suggestionsDiv.classList.add('d-none');
+                return;
+            }
+
+            // Fetch suggestions from API
+            fetch(`/api/search/suggestions?q=${encodeURIComponent(input.value)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        let html = '';
+                        data.forEach(item => {
+                            html += `
+                                <div class="suggestion-item" onclick="selectSuggestion('${item}')">
+                                    <i class="fas fa-search text-muted me-2"></i>
+                                    ${item}
+                                </div>
+                            `;
+                        });
+                        suggestionsDiv.innerHTML = html;
+                        suggestionsDiv.classList.remove('d-none');
+                    } else {
+                        suggestionsDiv.classList.add('d-none');
+                    }
+                })
+                .catch(() => {
+                    suggestionsDiv.classList.add('d-none');
+                });
+        }
+
+        // Select suggestion
+        function selectSuggestion(text) {
+            document.getElementById('searchInput').value = text;
+            document.getElementById('searchSuggestions').classList.add('d-none');
+            performSearch();
+        }
+
+        // Search trending
+        function searchTrending(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            performSearch();
+        }
+
+        // Search from history
+        function searchHistory(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            performSearch();
+        }
+
+        // Remove search history
+        function removeSearchHistory(e, keyword) {
+            e.stopPropagation();
+            fetch(`/api/search/history/remove?keyword=${encodeURIComponent(keyword)}`, {
+                method: 'DELETE'
+            }).then(() => {
+                e.target.closest('.suggestion-item').remove();
+            });
+        }
+
+        // Clear search history
+        function clearSearchHistory() {
+            fetch('/api/search/history/clear', {
+                method: 'DELETE'
+            }).then(() => {
+                document.querySelector('.search-history').innerHTML =
+                    '<div class="text-center text-muted py-3">Không có lịch sử tìm kiếm</div>';
+            });
+        }
+
+        // Apply filters
+        function applySearchFilters() {
+            const url = new URL(window.location.href);
+
+            // Price range
+            const priceMin = document.getElementById('priceFilterMin').value;
+            const priceMax = document.getElementById('priceFilterMax').value;
+            url.searchParams.set('minPrice', priceMin);
+            url.searchParams.set('maxPrice', priceMax);
+
+            // Categories
+            const selectedCategories = Array.from(document.querySelectorAll('.category-check:checked'))
+                .map(cb => cb.value);
+            url.searchParams.delete('category');
+            selectedCategories.forEach(cat => {
+                url.searchParams.append('category', cat);
+            });
+
+            // Brands
+            const selectedBrands = Array.from(document.querySelectorAll('.brand-check:checked'))
+                .map(cb => cb.value);
+            url.searchParams.delete('brand');
+            selectedBrands.forEach(brand => {
+                url.searchParams.append('brand', brand);
+            });
+
+            // In stock
+            if (document.getElementById('inStockCheck').checked) {
+                url.searchParams.set('inStock', 'true');
+            } else {
+                url.searchParams.delete('inStock');
+            }
+
+            // Rating
+            const rating = document.querySelector('input[name="ratingFilter"]:checked');
+            if (rating) {
+                url.searchParams.set('minRating', rating.value);
+            } else {
+                url.searchParams.delete('minRating');
+            }
+
+            window.location.href = url.toString();
+        }
+
+        // Remove filter
+        function removeFilter(filterType) {
+            const url = new URL(window.location.href);
+
+            switch(filterType) {
+                case 'keyword':
+                    url.searchParams.delete('keyword');
+                    break;
+                case 'category':
+                    url.searchParams.delete('category');
+                    break;
+                case 'minPrice':
+                    url.searchParams.delete('minPrice');
+                    break;
+                case 'maxPrice':
+                    url.searchParams.delete('maxPrice');
+                    break;
+            }
+
+            window.location.href = url.toString();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            window.location.href = '/search';
+        }
+
+        // Set sort
+        function setSort(sortBy) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('sort', sortBy);
+            window.location.href = url.toString();
+        }
+
+        // Change view
+        function changeView(viewType) {
+            const gridView = document.getElementById('gridView');
+            const listView = document.getElementById('listView');
+            const gridBtn = document.querySelector('button[onclick="changeView(\'grid\')"]');
+            const listBtn = document.querySelector('button[onclick="changeView(\'list\')"]');
+
+            if (viewType === 'grid') {
+                gridView.classList.remove('d-none');
+                listView.classList.add('d-none');
+                gridBtn.classList.add('active');
+                listBtn.classList.remove('active');
+            } else {
+                gridView.classList.add('d-none');
+                listView.classList.remove('d-none');
+                gridBtn.classList.remove('active');
+                listBtn.classList.add('active');
+            }
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: JSON.stringify({ productId: productId, quantity: 1 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart count
+                    const cartCount = document.querySelector('.badge.bg-danger');
+                    if (cartCount) {
+                        cartCount.textContent = data.cartCount;
+                    }
+
+                    // Show success message
+                    showToast('Thêm vào giỏ hàng thành công!', 'success');
+                } else {
+                    showToast('Có lỗi xảy ra!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra!', 'error');
+            });
+        }
+
+        // Price slider display
+        const priceFilterMin = document.getElementById('priceFilterMin');
+        const priceFilterMax = document.getElementById('priceFilterMax');
+        const priceFilterMinValue = document.getElementById('priceFilterMinValue');
+        const priceFilterMaxValue = document.getElementById('priceFilterMaxValue');
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+        }
+
+        if (priceFilterMin && priceFilterMax) {
+            priceFilterMin.addEventListener('input', () => {
+                priceFilterMinValue.textContent = formatCurrency(priceFilterMin.value);
+            });
+
+            priceFilterMax.addEventListener('input', () => {
+                priceFilterMaxValue.textContent = formatCurrency(priceFilterMax.value);
+            });
+        }
+
+        // Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('searchSuggestions').contains(e.target) &&
+                e.target.id !== 'searchInput') {
+                document.getElementById('searchSuggestions').classList.add('d-none');
+            }
+        });
+
+        // Show toast
+        function showToast(message, type) {
+            // Implement toast notification
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+            toast.style.position = 'fixed';
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            new bootstrap.Toast(toast).show();
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update price display
+            if (priceFilterMin && priceFilterMax) {
+                priceFilterMinValue.textContent = formatCurrency(priceFilterMin.value);
+                priceFilterMaxValue.textContent = formatCurrency(priceFilterMax.value);
+            }
+
+            // Hide suggestions on load
+            document.getElementById('searchSuggestions').classList.add('d-none');
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

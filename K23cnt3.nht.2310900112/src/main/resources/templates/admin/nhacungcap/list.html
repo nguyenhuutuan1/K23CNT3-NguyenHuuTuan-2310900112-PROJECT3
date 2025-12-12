@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/admin-layout}">
+<head>
+    <title>Quản lý nhà cung cấp</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Quản lý nhà cung cấp</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Nhà cung cấp</li>
+        </ol>
+
+        <!-- Thống kê nhanh -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fs-5 fw-bold" th:text="${tongNCC}">0</div>
+                                <div>Tổng NCC</div>
+                            </div>
+                            <i class="fas fa-truck fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fs-5 fw-bold" th:text="${nccDangHoatDong}">0</div>
+                                <div>Đang hoạt động</div>
+                            </div>
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fs-5 fw-bold" th:text="${tongSanPham}">0</div>
+                                <div>Tổng sản phẩm</div>
+                            </div>
+                            <i class="fas fa-boxes fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fs-5 fw-bold" th:text="${nccMoi}">0</div>
+                                <div>NCC mới (30 ngày)</div>
+                            </div>
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh công cụ -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-filter me-1"></i>
+                        Tìm kiếm & Lọc
+                    </div>
+                    <a th:href="@{/admin/nhacungcap/create}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Thêm NCC mới
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/nhacungcap}" method="get" class="row g-3">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="keyword"
+                                   placeholder="Tên NCC, email, điện thoại..." th:value="${param.keyword}">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i> Tìm
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" name="trangThai" onchange="this.form.submit()">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="DANG_HOP_TAC" th:selected="${param.trangThai == 'DANG_HOP_TAC'}">Đang hợp tác</option>
+                            <option value="TAM_NGUNG" th:selected="${param.trangThai == 'TAM_NGUNG'}">Tạm ngừng</option>
+                            <option value="NGUNG_HOP_TAC" th:selected="${param.trangThai == 'NGUNG_HOP_TAC'}">Ngừng hợp tác</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="sortBy" onchange="this.form.submit()">
+                            <option value="ten_asc" th:selected="${param.sortBy == 'ten_asc'}">Tên A-Z</option>
+                            <option value="ten_desc" th:selected="${param.sortBy == 'ten_desc'}">Tên Z-A</option>
+                            <option value="ngayTao_desc" th:selected="${param.sortBy == 'ngayTao_desc' || param.sortBy == null}">Mới nhất</option>
+                            <option value="ngayTao_asc" th:selected="${param.sortBy == 'ngayTao_asc'}">Cũ nhất</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Danh sách nhà cung cấp -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-table me-1"></i>
+                        Danh sách nhà cung cấp
+                    </div>
+                    <span class="badge bg-secondary">
+                        Hiển thị <span th:text="${nhaCungCapList.size()}">0</span> NCC
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Mã NCC</th>
+                            <th>Nhà cung cấp</th>
+                            <th>Thông tin liên hệ</th>
+                            <th>Sản phẩm</th>
+                            <th>Đánh giá</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ncc : ${nhaCungCapList}">
+                            <td>
+                                <span class="badge bg-secondary" th:text="${ncc.maNCC}">001</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold" th:text="${ncc.tenNCC}">Công ty TNHH Thực phẩm ABC</div>
+                                <div class="small text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    <span th:text="${ncc.diaChi} ?: 'Chưa có địa chỉ'"
+                                          style="max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        123 Lê Lợi, Quận 1, TP.HCM
+                                    </span>
+                                </div>
+                                <div class="small">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Ngày tham gia: <span th:text="${#temporals.format(ncc.ngayTao, 'dd/MM/yyyy')}">01/01/2024</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="mb-1">
+                                    <i class="fas fa-phone me-1"></i>
+                                    <span th:text="${ncc.dienThoai}">02838234567</span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-envelope me-1"></i>
+                                    <span th:text="${ncc.email}">contact@abcfood.com.vn</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    <div class="fw-bold text-primary" th:text="${ncc.tongSanPham}">15</div>
+                                    <small class="text-muted">sản phẩm</small>
+                                    <div class="mt-1">
+                                        <a th:href="@{/admin/sanpham?maNCC={id}(id=${ncc.maNCC})}"
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-eye"></i> Xem
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    <div class="mb-1">
+                                        <span th:if="${ncc.diemDanhGia}" class="text-warning">
+                                            <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, 5)}"
+                                               th:class="${i <= ncc.diemDanhGia ? 'fas fa-star' : 'far fa-star'}"></i>
+                                        </span>
+                                        <span th:unless="${ncc.diemDanhGia}" class="text-muted">
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted" th:text="${ncc.soLanGiaoDich} + ' giao dịch'">5 giao dịch</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span th:switch="${ncc.trangThai}">
+                                    <span th:case="'DANG_HOP_TAC'" class="badge bg-success">Đang hợp tác</span>
+                                    <span th:case="'TAM_NGUNG'" class="badge bg-warning">Tạm ngừng</span>
+                                    <span th:case="'NGUNG_HOP_TAC'" class="badge bg-danger">Ngừng hợp tác</span>
+                                </span>
+                                <div class="small text-muted mt-1">
+                                    <span th:if="${ncc.ngayCapNhat}">
+                                        Cập nhật: <span th:text="${#temporals.format(ncc.ngayCapNhat, 'dd/MM/yyyy')}">01/01/2024</span>
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a th:href="@{/admin/nhacungcap/edit/{id}(id=${ncc.maNCC})}"
+                                       class="btn btn-warning" title="Sửa thông tin">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-info"
+                                            onclick="xemChiTiet(${ncc.maNCC})" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-primary" title="Liên hệ">
+                                        <i class="fas fa-phone-alt"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger"
+                                            th:if="${ncc.trangThai != 'NGUNG_HOP_TAC'}"
+                                            onclick="confirmNgungHopTac(${ncc.maNCC})" title="Ngừng hợp tác">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Phân trang -->
+                <nav th:if="${totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/admin/nhacungcap(page=${currentPage-1}, keyword=${param.keyword}, trangThai=${param.trangThai})}">
+                                &laquo;
+                            </a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            class="page-item" th:classappend="${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/admin/nhacungcap(page=${i}, keyword=${param.keyword}, trangThai=${param.trangThai})}"
+                               th:text="${i}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/admin/nhacungcap(page=${currentPage+1}, keyword=${param.keyword}, trangThai=${param.trangThai})}">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Xác nhận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Nội dung sẽ được thay đổi bằng JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="confirmForm" method="post">
+                    <input type="hidden" name="_method" value="PUT">
+                    <button type="submit" class="btn btn-primary" id="modalConfirmBtn">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<th:block layout:fragment="scripts">
+    <script>
+        function xemChiTiet(maNCC) {
+            window.location.href = `/admin/nhacungcap/detail/\${maNCC}`;
+        }
+
+        function confirmNgungHopTac(maNCC) {
+            document.getElementById('modalTitle').textContent = 'Xác nhận ngừng hợp tác';
+            document.getElementById('modalBody').innerHTML =
+                'Bạn có chắc chắn muốn ngừng hợp tác với nhà cung cấp này?<br><br>' +
+                '<div class="alert alert-warning">' +
+                '  <i class="fas fa-exclamation-triangle"></i> ' +
+                '  Hành động này sẽ ảnh hưởng đến các sản phẩm liên quan!' +
+                '</div>' +
+                '<div class="form-group mt-2">' +
+                '  <label for="lyDo" class="form-label">Lý do ngừng hợp tác:</label>' +
+                '  <textarea class="form-control" id="lyDo" name="lyDo" rows="3" required></textarea>' +
+                '</div>';
+
+            const form = document.getElementById('confirmForm');
+            form.action = `/admin/nhacungcap/\${maNCC}/nghihoptac`;
+            form.innerHTML = `
+                <input type="hidden" name="_method" value="PUT">
+                <div class="form-group mb-2">
+                    <label for="lyDo" class="form-label">Lý do ngừng hợp tác:</label>
+                    <textarea class="form-control" id="lyDo" name="lyDo" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">Xác nhận ngừng hợp tác</button>
+            `;
+
+            new bootstrap.Modal(document.getElementById('confirmModal')).show();
+        }
+
+        // Reset bộ lọc
+        function resetFilter() {
+            window.location.href = '/admin/nhacungcap';
+        }
+    </script>
+</th:block>
+</body>
+</html>

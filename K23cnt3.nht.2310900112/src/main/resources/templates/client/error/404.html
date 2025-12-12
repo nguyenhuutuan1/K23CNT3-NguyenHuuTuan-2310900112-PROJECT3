@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/client-layout}">
+<head>
+    <title>404 - Trang không tìm thấy</title>
+
+    <th:block layout:fragment="styles">
+        <style>
+            .error-container {
+                min-height: 70vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 80px 0;
+                text-align: center;
+            }
+            .error-code {
+                font-size: 8rem;
+                font-weight: 800;
+                line-height: 1;
+                color: #28a745;
+                margin-bottom: 20px;
+                text-shadow: 4px 4px 0 rgba(40, 167, 69, 0.1);
+            }
+            .error-title {
+                font-size: 2.5rem;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: #343a40;
+            }
+            .error-message {
+                font-size: 1.2rem;
+                color: #6c757d;
+                max-width: 600px;
+                margin: 0 auto 30px;
+                line-height: 1.6;
+            }
+            .error-image {
+                max-width: 300px;
+                margin: 0 auto 40px;
+            }
+            .search-box {
+                max-width: 500px;
+                margin: 30px auto;
+            }
+            .action-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 30px;
+                flex-wrap: wrap;
+            }
+            .error-details {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-top: 40px;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .error-info {
+                font-size: 0.9rem;
+                color: #6c757d;
+                margin-top: 10px;
+            }
+            .suggestions {
+                text-align: left;
+                max-width: 600px;
+                margin: 30px auto;
+            }
+            .suggestion-list {
+                list-style: none;
+                padding-left: 0;
+            }
+            .suggestion-list li {
+                margin-bottom: 10px;
+                padding-left: 25px;
+                position: relative;
+            }
+            .suggestion-list li::before {
+                content: "•";
+                color: #28a745;
+                font-size: 1.5rem;
+                position: absolute;
+                left: 0;
+                top: -5px;
+            }
+            .floating-element {
+                position: absolute;
+                opacity: 0.1;
+                z-index: -1;
+            }
+            .floating-element-1 {
+                top: 20%;
+                left: 10%;
+                font-size: 10rem;
+                color: #28a745;
+            }
+            .floating-element-2 {
+                bottom: 20%;
+                right: 10%;
+                font-size: 8rem;
+                color: #20c997;
+                transform: rotate(45deg);
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="error-container">
+        <div class="container position-relative">
+            <!-- Floating Elements -->
+            <div class="floating-element floating-element-1">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="floating-element floating-element-2">
+                <i class="fas fa-question-circle"></i>
+            </div>
+
+            <!-- Error Content -->
+            <div class="error-code">404</div>
+            <div class="error-title">Oops! Trang không tìm thấy</div>
+
+            <!-- Error Image -->
+            <div class="error-image">
+                <img th:src="@{/images/404-error.png}" alt="404 Error" class="img-fluid">
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message">
+                Rất tiếc, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+                Có thể bạn đã nhập sai địa chỉ hoặc trang đã bị xóa.
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-box">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" id="searchInput"
+                           placeholder="Tìm kiếm sản phẩm hoặc trang bạn cần...">
+                    <button class="btn btn-success" type="button" onclick="searchFrom404()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="suggestions">
+                <h5 class="mb-3">Bạn có thể thử:</h5>
+                <ul class="suggestion-list">
+                    <li>Kiểm tra lại URL đã nhập</li>
+                    <li>Quay lại <a th:href="@{/}" class="text-success fw-bold">Trang chủ</a></li>
+                    <li>Sử dụng thanh tìm kiếm phía trên</li>
+                    <li>Xem qua các danh mục sản phẩm phổ biến</li>
+                    <li>Liên hệ hỗ trợ nếu bạn nghĩ đây là lỗi</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/}" class="btn btn-success btn-lg">
+                    <i class="fas fa-home me-2"></i>Về trang chủ
+                </a>
+                <a th:href="@{/products}" class="btn btn-outline-success btn-lg">
+                    <i class="fas fa-store me-2"></i>Mua sắm ngay
+                </a>
+                <a th:href="@{/contact}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-headset me-2"></i>Liên hệ hỗ trợ
+                </a>
+                <button class="btn btn-outline-primary btn-lg" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </button>
+            </div>
+
+            <!-- Error Details (only shown in development) -->
+            <div th:if="${showErrorDetails}" class="error-details">
+                <h5>Thông tin lỗi chi tiết:</h5>
+                <div class="error-info">
+                    <p><strong>URL:</strong> <span th:text="${path}">/some-page</span></p>
+                    <p><strong>Thời gian:</strong> <span th:text="${timestamp}">2023-11-15 10:30:00</span></p>
+                    <p><strong>Mã lỗi:</strong> <span th:text="${status}">404</span></p>
+                    <p><strong>Thông báo:</strong> <span th:text="${error}">Not Found</span></p>
+                    <p th:if="${trace}"><strong>Trace:</strong> <code th:text="${trace}"></code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Search function from 404 page
+        function searchFrom404() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm) {
+                window.location.href = '/search?keyword=' + encodeURIComponent(searchTerm);
+            }
+        }
+
+        // Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchFrom404();
+            }
+        });
+
+        // Auto-focus on search input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput').focus();
+        });
+
+        // Animate error code
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorCode = document.querySelector('.error-code');
+            if (errorCode) {
+                // Add animation class
+                errorCode.style.animation = 'pulse 2s infinite';
+
+                // Create keyframes for pulse animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.05); }
+                        100% { transform: scale(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

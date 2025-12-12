@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/client-layout}">
+<head>
+    <title>500 - Lỗi máy chủ</title>
+
+    <th:block layout:fragment="styles">
+        <style>
+            .error-container {
+                min-height: 70vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 80px 0;
+                text-align: center;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            }
+            .error-code {
+                font-size: 8rem;
+                font-weight: 800;
+                line-height: 1;
+                color: #dc3545;
+                margin-bottom: 20px;
+                text-shadow: 4px 4px 0 rgba(220, 53, 69, 0.1);
+            }
+            .error-title {
+                font-size: 2.5rem;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: #343a40;
+            }
+            .error-message {
+                font-size: 1.2rem;
+                color: #6c757d;
+                max-width: 600px;
+                margin: 0 auto 30px;
+                line-height: 1.6;
+            }
+            .error-image {
+                max-width: 300px;
+                margin: 0 auto 40px;
+            }
+            .error-actions {
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                max-width: 800px;
+                margin: 40px auto 0;
+            }
+            .action-steps {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 30px;
+                flex-wrap: wrap;
+            }
+            .step-card {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                width: 200px;
+                text-align: center;
+                transition: transform 0.3s;
+            }
+            .step-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            .step-icon {
+                width: 60px;
+                height: 60px;
+                background: #dc3545;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 15px;
+                font-size: 1.5rem;
+            }
+            .step-title {
+                font-weight: 600;
+                margin-bottom: 10px;
+                color: #343a40;
+            }
+            .step-description {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            .technical-details {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-top: 40px;
+                text-align: left;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .tech-info {
+                font-family: monospace;
+                background: white;
+                padding: 15px;
+                border-radius: 5px;
+                overflow-x: auto;
+                margin-top: 10px;
+                font-size: 0.9rem;
+            }
+            .refresh-button {
+                position: relative;
+                overflow: hidden;
+            }
+            .refresh-button .spinner {
+                display: none;
+                margin-right: 8px;
+            }
+            .refresh-button.loading .spinner {
+                display: inline-block;
+                animation: spin 1s linear infinite;
+            }
+            .server-status {
+                display: inline-flex;
+                align-items: center;
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                margin-bottom: 20px;
+            }
+            .status-online {
+                background: #d4edda;
+                color: #155724;
+            }
+            .status-offline {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            .status-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 8px;
+            }
+            .status-online .status-dot {
+                background: #28a745;
+                animation: blink 2s infinite;
+            }
+            .status-offline .status-dot {
+                background: #dc3545;
+            }
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .countdown {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #dc3545;
+                margin: 20px 0;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="error-container">
+        <div class="container">
+            <!-- Server Status -->
+            <div class="server-status status-offline">
+                <span class="status-dot"></span>
+                <span>Máy chủ tạm thời gặp sự cố</span>
+            </div>
+
+            <!-- Error Code -->
+            <div class="error-code">500</div>
+            <div class="error-title">Lỗi máy chủ nội bộ</div>
+
+            <!-- Error Image -->
+            <div class="error-image">
+                <img th:src="@{/images/500-error.png}" alt="500 Error" class="img-fluid">
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message">
+                Đã xảy ra lỗi không mong muốn trên máy chủ của chúng tôi.
+                Đội ngũ kỹ thuật đã được thông báo và đang khắc phục sự cố.
+            </div>
+
+            <!-- Countdown for auto-refresh -->
+            <div class="countdown" id="countdown">Tự động làm mới sau: <span id="countdownNumber">30</span> giây</div>
+
+            <!-- Error Actions -->
+            <div class="error-actions">
+                <h4 class="mb-4">Bạn có thể thử:</h4>
+
+                <div class="action-steps">
+                    <!-- Step 1: Refresh -->
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="step-title">Làm mới trang</div>
+                        <div class="step-description">
+                            Thử tải lại trang để xem lỗi đã được khắc phục chưa
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm mt-3 refresh-button"
+                                id="refreshBtn" onclick="refreshPage()">
+                            <span class="spinner">
+                                <i class="fas fa-spinner"></i>
+                            </span>
+                            <span>Thử lại ngay</span>
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Wait -->
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="step-title">Chờ trong giây lát</div>
+                        <div class="step-description">
+                            Sự cố thường được khắc phục trong vài phút
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Contact -->
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="step-title">Liên hệ hỗ trợ</div>
+                        <div class="step-description">
+                            Thông báo cho chúng tôi nếu lỗi vẫn tiếp diễn
+                        </div>
+                        <a th:href="@{/contact}" class="btn btn-outline-danger btn-sm mt-3">
+                            Liên hệ ngay
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Main Actions -->
+                <div class="d-flex justify-content-center gap-3 mt-5">
+                    <a th:href="@{/}" class="btn btn-danger btn-lg">
+                        <i class="fas fa-home me-2"></i>Về trang chủ
+                    </a>
+                    <button class="btn btn-outline-danger btn-lg" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg" onclick="clearCache()">
+                        <i class="fas fa-trash-alt me-2"></i>Xóa cache
+                    </button>
+                </div>
+            </div>
+
+            <!-- Technical Details -->
+            <div th:if="${showErrorDetails}" class="technical-details">
+                <h5 class="mb-3">
+                    <i class="fas fa-bug me-2"></i>Thông tin kỹ thuật
+                    <button class="btn btn-sm btn-outline-secondary float-end"
+                            onclick="copyErrorDetails()">
+                        <i class="fas fa-copy me-1"></i>Sao chép
+                    </button>
+                </h5>
+
+                <div class="tech-info" id="errorDetails">
+                    <p><strong>Mã lỗi:</strong> <span th:text="${status}">500</span></p>
+                    <p><strong>Thời gian:</strong> <span th:text="${timestamp}">2023-11-15 10:30:00</span></p>
+                    <p><strong>Lỗi:</strong> <span th:text="${error}">Internal Server Error</span></p>
+                    <p><strong>Thông báo:</strong> <span th:text="${message}">An unexpected error occurred</span></p>
+                    <p th:if="${path}"><strong>Path:</strong> <span th:text="${path}">/api/some-endpoint</span></p>
+                    <p th:if="${trace}"><strong>Stack Trace:</strong></p>
+                    <pre th:if="${trace}" th:text="${trace}" style="white-space: pre-wrap; word-break: break-all;"></pre>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <small class="text-muted">
+                        Vui lòng cung cấp thông tin này khi liên hệ hỗ trợ kỹ thuật
+                    </small>
+                </div>
+            </div>
+
+            <!-- Maintenance Info -->
+            <div th:if="${maintenance}" class="alert alert-warning mt-4" style="max-width: 800px; margin: 0 auto;">
+                <h5><i class="fas fa-tools me-2"></i>Thông báo bảo trì</h5>
+                <p class="mb-2">
+                    Hệ thống đang được bảo trì nâng cấp.
+                    Dự kiến hoạt động lại vào:
+                    <strong th:text="${maintenanceEndTime}">15/11/2023 12:00</strong>
+                </p>
+                <p class="mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Trong thời gian này, một số tính năng có thể không khả dụng.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Refresh page function
+        function refreshPage() {
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            // Simulate loading for 2 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
+
+        // Clear cache function
+        function clearCache() {
+            if (confirm('Bạn có chắc muốn xóa cache trình duyệt? Điều này có thể giúp khắc phục một số lỗi.')) {
+                // Clear localStorage
+                localStorage.clear();
+
+                // Clear sessionStorage
+                sessionStorage.clear();
+
+                // Delete cookies
+                document.cookie.split(";").forEach(function(c) {
+                    document.cookie = c.replace(/^ +/, "")
+                        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+
+                alert('Đã xóa cache. Trang sẽ được làm mới...');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        }
+
+        // Copy error details to clipboard
+        function copyErrorDetails() {
+            const errorDetails = document.getElementById('errorDetails').innerText;
+            navigator.clipboard.writeText(errorDetails).then(() => {
+                alert('Đã sao chép thông tin lỗi vào clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Không thể sao chép thông tin lỗi.');
+            });
+        }
+
+        // Countdown for auto-refresh
+        let countdown = 30;
+        let countdownInterval;
+
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdownNumber');
+
+            countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown').innerHTML =
+                        '<i class="fas fa-sync-alt me-2"></i>Đang làm mới trang...';
+                    refreshPage();
+                }
+            }, 1000);
+        }
+
+        // Check server status (simulated)
+        function checkServerStatus() {
+            // In real app, this would be an API call
+            // For demo, we'll simulate server coming back online after 30 seconds
+            setTimeout(() => {
+                const statusElement = document.querySelector('.server-status');
+                statusElement.className = 'server-status status-online';
+                statusElement.innerHTML = `
+                    <span class="status-dot"></span>
+                    <span>Máy chủ đã hoạt động trở lại</span>
+                `;
+
+                // Stop countdown
+                clearInterval(countdownInterval);
+                document.getElementById('countdown').style.display = 'none';
+
+                // Show success message
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success mt-3';
+                successAlert.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    Máy chủ đã hoạt động trở lại. Trang sẽ tự động làm mới trong 5 giây...
+                `;
+                document.querySelector('.error-actions').prepend(successAlert);
+
+                // Auto-refresh after 5 seconds
+                setTimeout(() => {
+                    window.location.reload();
+                }, 5000);
+            }, 30000); // 30 seconds
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start countdown
+            startCountdown();
+
+            // Check server status
+            checkServerStatus();
+
+            // Add keyboard shortcut (Ctrl + R)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    refreshPage();
+                }
+            });
+
+            // Try to ping server every 10 seconds
+            setInterval(() => {
+                fetch('/api/health', { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            // Server is back online
+                            window.location.reload();
+                        }
+                    })
+                    .catch(() => {
+                        // Server still down, continue waiting
+                    });
+            }, 10000);
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

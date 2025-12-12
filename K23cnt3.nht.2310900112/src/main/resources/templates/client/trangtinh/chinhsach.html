@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/client-layout}">
+<head>
+    <title>Chính sách & Điều khoản</title>
+
+    <th:block layout:fragment="styles">
+        <style>
+            .policy-hero {
+                background: linear-gradient(rgba(40, 167, 69, 0.9), rgba(32, 201, 151, 0.9)),
+                            url('/images/policy-hero.jpg');
+                background-size: cover;
+                background-position: center;
+                color: white;
+                padding: 80px 0;
+                text-align: center;
+                border-radius: 0 0 30px 30px;
+            }
+            .policy-sidebar {
+                position: sticky;
+                top: 20px;
+                background: #f8f9fa;
+                border-radius: 15px;
+                padding: 25px;
+                height: fit-content;
+            }
+            .policy-nav {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            .policy-nav li {
+                margin-bottom: 10px;
+            }
+            .policy-nav a {
+                display: block;
+                padding: 12px 15px;
+                color: #495057;
+                text-decoration: none;
+                border-radius: 8px;
+                transition: all 0.3s;
+                border-left: 3px solid transparent;
+            }
+            .policy-nav a:hover {
+                background: #e9ecef;
+                color: #28a745;
+                border-left-color: #28a745;
+            }
+            .policy-nav a.active {
+                background: #28a745;
+                color: white;
+                border-left-color: #155724;
+            }
+            .policy-content {
+                background: white;
+                border-radius: 15px;
+                padding: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            }
+            .policy-section {
+                margin-bottom: 40px;
+                padding-bottom: 40px;
+                border-bottom: 2px solid #f8f9fa;
+            }
+            .policy-section:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            .policy-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #28a745;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #e9ecef;
+            }
+            .policy-subtitle {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #495057;
+                margin: 25px 0 15px;
+            }
+            .policy-text {
+                line-height: 1.8;
+                color: #495057;
+                margin-bottom: 15px;
+            }
+            .policy-list {
+                padding-left: 20px;
+                margin-bottom: 20px;
+            }
+            .policy-list li {
+                margin-bottom: 10px;
+                line-height: 1.6;
+            }
+            .highlight-box {
+                background: #f8fff9;
+                border-left: 4px solid #28a745;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 0 8px 8px 0;
+            }
+            .info-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+            .info-table th,
+            .info-table td {
+                border: 1px solid #dee2e6;
+                padding: 12px 15px;
+                text-align: left;
+            }
+            .info-table th {
+                background: #f8f9fa;
+                font-weight: 600;
+            }
+            .update-info {
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                padding: 15px;
+                margin-top: 30px;
+                font-size: 0.9rem;
+            }
+            .contact-link {
+                color: #28a745;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .contact-link:hover {
+                text-decoration: underline;
+            }
+            .definition-box {
+                background: #e7f7ff;
+                border: 1px solid #b3e0ff;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 15px 0;
+            }
+            .term {
+                font-weight: 600;
+                color: #28a745;
+            }
+            .scroll-spy {
+                position: relative;
+            }
+            .back-to-top {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                width: 50px;
+                height: 50px;
+                background: #28a745;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+            .back-to-top.show {
+                opacity: 1;
+            }
+            .back-to-top:hover {
+                background: #218838;
+                color: white;
+            }
+            .policy-note {
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                margin: 15px 0;
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Hero Section -->
+    <section class="policy-hero">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-3">Chính sách & Điều khoản</h1>
+            <p class="lead mb-4">Thông tin quan trọng về quyền lợi và trách nhiệm của khách hàng</p>
+        </div>
+    </section>
+
+    <!-- Policy Content -->
+    <div class="container py-5">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3 mb-5">
+                <div class="policy-sidebar">
+                    <h4 class="mb-4">Mục lục</h4>
+                    <ul class="policy-nav">
+                        <li><a href="#terms" class="active">Điều khoản dịch vụ</a></li>
+                        <li><a href="#privacy">Chính sách bảo mật</a></li>
+                        <li><a href="#shipping">Chính sách vận chuyển</a></li>
+                        <li><a href="#return">Chính sách đổi trả</a></li>
+                        <li><a href="#payment">Chính sách thanh toán</a></li>
+                        <li><a href="#warranty">Chính sách bảo hành</a></li>
+                        <li><a href="#security">Bảo mật thông tin</a></li>
+                        <li><a href="#cookie">Chính sách Cookie</a></li>
+                        <li><a href="#faq">Câu hỏi thường gặp</a></li>
+                    </ul>
+
+                    <div class="update-info">
+                        <strong><i class="fas fa-clock me-2"></i>Cập nhật lần cuối:</strong>
+                        <div class="mt-2">Ngày 15 tháng 11 năm 2023</div>
+                        <a th:href="@{/contact}" class="btn btn-sm btn-outline-success w-100 mt-3">
+                            <i class="fas fa-question-circle me-1"></i>Cần hỗ trợ?
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="policy-content scroll-spy">
+                    <!-- Terms of Service -->
+                    <section id="terms" class="policy-section">
+                        <h2 class="policy-title">Điều khoản dịch vụ</h2>
+
+                        <div class="definition-box">
+                            <p><span class="term">"Dịch vụ"</span> chỉ website GroceryStore.com và các ứng dụng di động liên quan.</p>
+                            <p><span class="term">"Người dùng"</span> là bất kỳ cá nhân hoặc tổ chức nào truy cập hoặc sử dụng Dịch vụ.</p>
+                        </div>
+
+                        <h3 class="policy-subtitle">1. Chấp nhận điều khoản</h3>
+                        <p class="policy-text">Bằng việc truy cập và sử dụng Dịch vụ, bạn đồng ý tuân thủ và bị ràng buộc bởi các điều khoản và điều kiện được nêu trong tài liệu này. Nếu bạn không đồng ý với bất kỳ điều khoản nào, vui lòng không sử dụng Dịch vụ.</p>
+
+                        <h3 class="policy-subtitle">2. Điều kiện sử dụng</h3>
+                        <p class="policy-text">Người dùng cam kết:</p>
+                        <ul class="policy-list">
+                            <li>Cung cấp thông tin chính xác, đầy đủ và cập nhật khi đăng ký tài khoản</li>
+                            <li>Không sử dụng Dịch vụ cho mục đích bất hợp pháp hoặc trái pháp luật</li>
+                            <li>Không can thiệp, làm gián đoạn hoặc tấn công hệ thống Dịch vụ</li>
+                            <li>Không sao chép, phân phối hoặc sử dụng trái phép nội dung trên Dịch vụ</li>
+                            <li>Không mua sắm với mục đích đầu cơ, tích trữ hoặc thương mại không được cho phép</li>
+                        </ul>
+
+                        <h3 class="policy-subtitle">3. Tài khoản người dùng</h3>
+                        <p class="policy-text">Khi tạo tài khoản, bạn có trách nhiệm:</p>
+                        <ul class="policy-list">
+                            <li>Bảo mật thông tin đăng nhập và mật khẩu</li>
+                            <li>Thông báo ngay cho chúng tôi nếu phát hiện hành vi truy cập trái phép</li>
+                            <li>Chịu trách nhiệm về mọi hoạt động xảy ra dưới tài khoản của bạn</li>
+                        </ul>
+
+                        <div class="highlight-box">
+                            <p><strong>Lưu ý quan trọng:</strong> Chúng tôi có quyền từ chối dịch vụ, chấm dứt tài khoản, hoặc hủy đơn hàng bất kỳ lúc nào nếu phát hiện hành vi vi phạm điều khoản.</p>
+                        </div>
+                    </section>
+
+                    <!-- Privacy Policy -->
+                    <section id="privacy" class="policy-section">
+                        <h2 class="policy-title">Chính sách bảo mật</h2>
+
+                        <h3 class="policy-subtitle">1. Thông tin thu thập</h3>
+                        <p class="policy-text">Chúng tôi thu thập các loại thông tin sau:</p>
+                        <table class="info-table">
+                            <thead>
+                            <tr>
+                                <th>Loại thông tin</th>
+                                <th>Mục đích sử dụng</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Thông tin cá nhân (họ tên, email, số điện thoại)</td>
+                                <td>Tạo tài khoản, xác thực, liên hệ</td>
+                            </tr>
+                            <tr>
+                                <td>Thông tin địa chỉ giao hàng</td>
+                                <td>Thực hiện giao dịch, vận chuyển</td>
+                            </tr>
+                            <tr>
+                                <td>Thông tin thanh toán</td>
+                                <td>Xử lý đơn hàng, hoàn tiền</td>
+                            </tr>
+                            <tr>
+                                <td>Dữ liệu truy cập (IP, trình duyệt, thiết bị)</td>
+                                <td>Phân tích, cải thiện dịch vụ</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="policy-subtitle">2. Bảo mật thông tin</h3>
+                        <p class="policy-text">Chúng tôi cam kết:</p>
+                        <ul class="policy-list">
+                            <li>Áp dụng các biện pháp bảo mật tiêu chuẩn công nghiệp</li>
+                            <li>Mã hóa thông tin nhạy cảm trong quá trình truyền tải</li>
+                            <li>Chỉ cung cấp thông tin cho bên thứ ba khi có sự đồng ý hoặc yêu cầu pháp lý</li>
+                            <li>Tuân thủ Luật Bảo vệ thông tin cá nhân của Việt Nam</li>
+                        </ul>
+
+                        <h3 class="policy-subtitle">3. Quyền của người dùng</h3>
+                        <p class="policy-text">Bạn có quyền:</p>
+                        <ul class="policy-list">
+                            <li>Truy cập và chỉnh sửa thông tin cá nhân</li>
+                            <li>Yêu cầu xóa tài khoản và dữ liệu cá nhân</li>
+                            <li>Từ chối nhận thông tin tiếp thị</li>
+                            <li>Khiếu nại về việc xử lý thông tin cá nhân</li>
+                        </ul>
+
+                        <div class="policy-note">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Để thực hiện các quyền trên, vui lòng liên hệ qua email:
+                            <a href="mailto:privacy@grocerystore.com" class="contact-link">privacy@grocerystore.com</a>
+                        </div>
+                    </section>
+
+                    <!-- Shipping Policy -->
+                    <section id="shipping" class="policy-section">
+                        <h2 class="policy-title">Chính sách vận chuyển</h2>
+
+                        <h3 class="policy-subtitle">1. Phạm vi giao hàng</h3>
+                        <p class="policy-text">Chúng tôi giao hàng trên toàn quốc với các mức phí và thời gian khác nhau:</p>
+                        <table class="info-table">
+                            <thead>
+                            <tr>
+                                <th>Khu vực</th>
+                                <th>Thời gian dự kiến</th>
+                                <th>Phí vận chuyển</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Nội thành TP.HCM/Hà Nội</td>
+                                <td>2-4 giờ</td>
+                                <td>20,000 đ (Miễn phí từ 300,000 đ)</td>
+                            </tr>
+                            <tr>
+                                <td>Ngoại thành TP.HCM/Hà Nội</td>
+                                <td>24-48 giờ</td>
+                                <td>30,000 đ (Miễn phí từ 500,000 đ)</td>
+                            </tr>
+                            <tr>
+                                <td>Các tỉnh thành khác</td>
+                                <td>2-4 ngày làm việc</td>
+                                <td>Theo báo giá đơn vị vận chuyển</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="policy-subtitle">2. Quy trình giao hàng</h3>
+                        <ol class="policy-list">
+                            <li>Nhân viên giao hàng sẽ liên hệ trước 30 phút</li>
+                            <li>Kiểm tra sản phẩm và thanh toán khi nhận hàng (nếu chọn COD)</li>
+                            <li>Ký xác nhận đã nhận hàng</li>
+                            <li>Giữ lại hóa đơn để đối chiếu khi cần</li>
+                        </ol>
+
+                        <h3 class="policy-subtitle">3. Xử lý khi không giao được</h3>
+                        <p class="policy-text">Trong trường hợp không giao được hàng sau 3 lần liên hệ, đơn hàng sẽ bị hủy và hoàn tiền (nếu đã thanh toán). Phí hủy đơn có thể được áp dụng.</p>
+
+                        <div class="highlight-box">
+                            <p><strong>Lưu ý:</strong> Thời gian giao hàng có thể thay đổi trong các dịp lễ, Tết hoặc điều kiện thời tiết bất thường.</p>
+                        </div>
+                    </section>
+
+                    <!-- Return Policy -->
+                    <section id="return" class="policy-section">
+                        <h2 class="policy-title">Chính sách đổi trả hàng</h2>
+
+                        <h3 class="policy-subtitle">1. Điều kiện đổi trả</h3>
+                        <p class="policy-text">Chấp nhận đổi trả trong vòng 7 ngày kể từ ngày nhận hàng với các điều kiện:</p>
+                        <ul class="policy-list">
+                            <li>Sản phẩm bị lỗi kỹ thuật do nhà sản xuất</li>
+                            <li>Sản phẩm không đúng với mô tả trên website</li>
+                            <li>Sản phẩm bị hư hỏng trong quá trình vận chuyển</li>
+                            <li>Sản phẩm còn nguyên vẹn, chưa qua sử dụng</li>
+                            <li>Còn đầy đủ hóa đơn, tem mác, bao bì gốc</li>
+                        </ul>
+
+                        <h3 class="policy-subtitle">2. Trường hợp không áp dụng</h3>
+                        <p class="policy-text">Không chấp nhận đổi trả đối với:</p>
+                        <ul class="policy-list">
+                            <li>Sản phẩm thực phẩm tươi sống (trừ trường hợp hư hỏng)</li>
+                            <li>Sản phẩm đã qua sử dụng, mất tem mác</li>
+                            <li>Đổi ý không muốn mua nữa (với sản phẩm không lỗi)</li>
+                            <li>Sản phẩm giảm giá, khuyến mãi đặc biệt (trừ lỗi sản xuất)</li>
+                        </ul>
+
+                        <h3 class="policy-subtitle">3. Quy trình đổi trả</h3>
+                        <ol class="policy-list">
+                            <li>Liên hệ hotline (028) 1234 5678 trong vòng 48 giờ sau nhận hàng</li>
+                            <li>Cung cấp hình ảnh/video minh chứng lỗi sản phẩm</li>
+                            <li>Nhân viên sẽ đến thu hồi sản phẩm (miễn phí trong nội thành)</li>
+                            <li>Xử lý trong vòng 7-14 ngày làm việc</li>
+                        </ol>
+                    </section>
+
+                    <!-- Payment Policy -->
+                    <section id="payment" class="policy-section">
+                        <h2 class="policy-title">Chính sách thanh toán</h2>
+
+                        <h3 class="policy-subtitle">1. Phương thức thanh toán</h3>
+                        <p class="policy-text">Chúng tôi chấp nhận các phương thức thanh toán sau:</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="policy-list">
+                                    <li><strong>Thanh toán khi nhận hàng (COD)</strong></li>
+                                    <li><strong>Chuyển khoản ngân hàng</strong>
+                                        <ul>
+                                            <li>Vietcombank: 123456789</li>
+                                            <li>Techcombank: 987654321</li>
+                                            <li>MB Bank: 456789123</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="policy-list">
+                                    <li><strong>Ví điện tử</strong>
+                                        <ul>
+                                            <li>MoMo</li>
+                                            <li>ZaloPay</li>
+                                            <li>VNPay</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Thẻ quốc tế</strong>
+                                        <ul>
+                                            <li>Visa/Mastercard</li>
+                                            <li>JCB</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3 class="policy-subtitle">2. Xử lý giao dịch</h3>
+                        <p class="policy-text">Mọi giao dịch đều được mã hóa SSL 256-bit. Thông tin thẻ tín dụng không được lưu trữ trên hệ thống của chúng tôi.</p>
+
+                        <h3 class="policy-subtitle">3. Hoàn tiền</h3>
+                        <p class="policy-text">Thời gian hoàn tiền:</p>
+                        <ul class="policy-list">
+                            <li>Chuyển khoản ngân hàng: 3-5 ngày làm việc</li>
+                            <li>Thẻ tín dụng/Ví điện tử: 7-14 ngày làm việc</li>
+                            <li>COD: Liên hệ để nhận hướng dẫn hoàn tiền</li>
+                        </ul>
+                    </section>
+
+                    <!-- Warranty Policy -->
+                    <section id="warranty" class="policy-section">
+                        <h2 class="policy-title">Chính sách bảo hành</h2>
+
+                        <h3 class="policy-subtitle">1. Thời gian bảo hành</h3>
+                        <p class="policy-text">Tùy theo loại sản phẩm:</p>
+                        <table class="info-table">
+                            <thead>
+                            <tr>
+                                <th>Loại sản phẩm</th>
+                                <th>Thời gian bảo hành</th>
+                                <th>Điều kiện</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Điện tử gia dụng</td>
+                                <td>12-24 tháng</td>
+                                <td>Theo chính sách nhà sản xuất</td>
+                            </tr>
+                            <tr>
+                                <td>Dụng cụ nhà bếp</td>
+                                <td>6-12 tháng</td>
+                                <td>Không bao gồm hao mòn tự nhiên</td>
+                            </tr>
+                            <tr>
+                                <td>Sản phẩm có tem bảo hành</td>
+                                <td>Theo tem</td>
+                                <td>Xuất trình hóa đơn và tem</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="policy-subtitle">2. Quy trình bảo hành</h3>
+                        <ol class="policy-list">
+                            <li>Liên hệ hotline hoặc email bảo hành</li>
+                            <li>Cung cấp hình ảnh lỗi và thông tin sản phẩm</li>
+                            <li>Gửi sản phẩm đến trung tâm bảo hành (miễn phí vận chuyển)</li>
+                            <li>Thời gian xử lý: 15-30 ngày làm việc</li>
+                        </ol>
+                    </section>
+
+                    <!-- Security Policy -->
+                    <section id="security" class="policy-section">
+                        <h2 class="policy-title">Bảo mật thông tin thanh toán</h2>
+
+                        <h3 class="policy-subtitle">1. Tiêu chuẩn bảo mật</h3>
+                        <p class="policy-text">Chúng tôi tuân thủ các tiêu chuẩn bảo mật quốc tế:</p>
+                        <ul class="policy-list">
+                            <li>PCI DSS (Payment Card Industry Data Security Standard)</li>
+                            <li>SSL/TLS encryption 256-bit</li>
+                            <li>Two-factor authentication cho tài khoản quan trọng</li>
+                            <li>Regular security audit và penetration testing</li>
+                        </ul>
+
+                        <h3 class="policy-subtitle">2. Trách nhiệm người dùng</h3>
+                        <p class="policy-text">Để bảo vệ tài khoản của mình, bạn nên:</p>
+                        <ul class="policy-list">
+                            <li>Không chia sẻ thông tin đăng nhập với người khác</li>
+                            <li>Sử dụng mật khẩu mạnh và thay đổi định kỳ</li>
+                            <li>Đăng xuất khi sử dụng thiết bị công cộng</li>
+                            <li>Cập nhật phần mềm diệt virus thường xuyên</li>
+                        </ul>
+                    </section>
+
+                    <!-- Cookie Policy -->
+                    <section id="cookie" class="policy-section">
+                        <h2 class="policy-title">Chính sách Cookie</h2>
+
+                        <h3 class="policy-subtitle">1. Cookie là gì?</h3>
+                        <p class="policy-text">Cookie là các tệp tin nhỏ được lưu trữ trên thiết bị của bạn khi truy cập website, giúp ghi nhớ thông tin và cải thiện trải nghiệm người dùng.</p>
+
+                        <h3 class="policy-subtitle">2. Loại Cookie sử dụng</h3>
+                        <table class="info-table">
+                            <thead>
+                            <tr>
+                                <th>Loại Cookie</th>
+                                <th>Mục đích</th>
+                                <th>Thời gian lưu</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Cookie thiết yếu</td>
+                                <td>Duy trì phiên đăng nhập, giỏ hàng</td>
+                                <td>Phiên làm việc</td>
+                            </tr>
+                            <tr>
+                                <td>Cookie hiệu năng</td>
+                                <td>Phân tích lưu lượng truy cập</td>
+                                <td>2 năm</td>
+                            </tr>
+                            <tr>
+                                <td>Cookie chức năng</td>
+                                <td>Ghi nhớ tùy chọn người dùng</td>
+                                <td>1 năm</td>
+                            </tr>
+                            <tr>
+                                <td>Cookie quảng cáo</td>
+                                <td>Hiển thị quảng cáo phù hợp</td>
+                                <td>6 tháng</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="policy-subtitle">3. Quản lý Cookie</h3>
+                        <p class="policy-text">Bạn có thể quản lý hoặc vô hiệu hóa cookie thông qua cài đặt trình duyệt. Tuy nhiên, việc vô hiệu hóa cookie thiết yếu có thể ảnh hưởng đến chức năng của website.</p>
+                    </section>
+
+                    <!-- FAQ -->
+                    <section id="faq" class="policy-section">
+                        <h2 class="policy-title">Câu hỏi thường gặp</h2>
+
+                        <div class="accordion" id="policyFAQ">
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#faq1">
+                                        Tôi có thể hủy đơn hàng sau khi đặt không?
+                                    </button>
+                                </h3>
+                                <div id="faq1" class="accordion-collapse collapse"
+                                     data-bs-parent="#policyFAQ">
+                                    <div class="accordion-body">
+                                        Có, bạn có thể hủy đơn hàng trước khi đơn hàng được xác nhận. Sau khi xác nhận, việc hủy đơn có thể bị áp dụng phí hủy. Vui lòng liên hệ hotline (028) 1234 5678 để được hỗ trợ.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#faq2">
+                                        Làm thế nào để khiếu nại về chất lượng sản phẩm?
+                                    </button>
+                                </h3>
+                                <div id="faq2" class="accordion-collapse collapse"
+                                     data-bs-parent="#policyFAQ">
+                                    <div class="accordion-body">
+                                        Bạn có thể khiếu nại qua:
+                                        <ul>
+                                            <li>Hotline: (028) 1234 5678</li>
+                                            <li>Email: quality@grocerystore.com</li>
+                                            <li>Trực tiếp tại cửa hàng</li>
+                                        </ul>
+                                        Vui lòng cung cấp hình ảnh, video và thông tin đơn hàng để được xử lý nhanh nhất.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#faq3">
+                                        Tôi có thể thay đổi địa chỉ giao hàng sau khi đặt hàng không?
+                                    </button>
+                                </h3>
+                                <div id="faq3" class="accordion-collapse collapse"
+                                     data-bs-parent="#policyFAQ">
+                                    <div class="accordion-body">
+                                        Có, bạn có thể thay đổi địa chỉ giao hàng trước khi đơn hàng được chuẩn bị. Sau khi đơn hàng đã được đóng gói, việc thay đổi có thể không khả thi. Vui lòng liên hệ hỗ trợ khách hàng càng sớm càng tốt.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#faq4">
+                                        Chính sách này có hiệu lực từ khi nào?
+                                    </button>
+                                </h3>
+                                <div id="faq4" class="accordion-collapse collapse"
+                                     data-bs-parent="#policyFAQ">
+                                    <div class="accordion-body">
+                                        Chính sách này có hiệu lực từ ngày 15/11/2023 và thay thế cho tất cả các chính sách trước đó. Chúng tôi có quyền cập nhật chính sách bất kỳ lúc nào và sẽ thông báo đến người dùng qua email hoặc thông báo trên website.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <p class="lead">Vẫn còn thắc mắc?</p>
+                            <a th:href="@{/contact}" class="btn btn-success btn-lg">
+                                <i class="fas fa-headset me-2"></i>Liên hệ hỗ trợ
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back to Top Button -->
+<a href="#" class="back-to-top" id="backToTop">
+    <i class="fas fa-chevron-up"></i>
+</a>
+
+<th:block layout:fragment="scripts">
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('.policy-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Update active nav item
+                document.querySelectorAll('.policy-nav a').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Scroll to section
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Update active nav on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.policy-section');
+            const navLinks = document.querySelectorAll('.policy-nav a');
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Show/hide back to top button
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        // Back to top functionality
+        document.getElementById('backToTop').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Print policy
+        function printPolicy() {
+            window.print();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set first nav item as active
+            const firstNavItem = document.querySelector('.policy-nav a');
+            if (firstNavItem) {
+                firstNavItem.classList.add('active');
+            }
+        });
+    </script>
+</th:block>
+
+</body>
+</html>
