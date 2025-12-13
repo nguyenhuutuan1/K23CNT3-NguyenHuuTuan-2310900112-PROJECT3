@@ -1,4 +1,4 @@
-package K23cnt3.nht._2.task;
+package K23cnt3.nht._2;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

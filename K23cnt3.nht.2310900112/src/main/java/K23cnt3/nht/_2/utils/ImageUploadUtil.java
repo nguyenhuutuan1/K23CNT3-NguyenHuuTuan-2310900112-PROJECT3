@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class ImageUploadUtil {
@@ -57,7 +58,7 @@ public class ImageUploadUtil {
     /**
      * Generate image hash for duplicate detection
      */
-    public static String generateImageHash(MultipartFile file) throws IOException {
+    public static String generateImageHash(MultipartFile file) throws IOException, NoSuchAlgorithmException {
         byte[] bytes = file.getBytes();
         return Base64.getEncoder().encodeToString(
                 java.security.MessageDigest.getInstance("MD5").digest(bytes)

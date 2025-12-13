@@ -1,4 +1,4 @@
-package K23cnt3.nht._2;
+package K23cnt3.nht._2;  // ĐÚNG
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,10 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        System.out.println("==========================================");
-        System.out.println("ỨNG DỤNG TẠP HÓA NHT ĐANG CHẠY!");
-        System.out.println("Nguyễn Hữu Tuấn - 2310900112");
-        System.out.println("API: http://localhost:8080/api/hello");
-        System.out.println("==========================================");
+        System.out.println("Ứng dụng tạp hóa đang chạy!");
     }
 }
