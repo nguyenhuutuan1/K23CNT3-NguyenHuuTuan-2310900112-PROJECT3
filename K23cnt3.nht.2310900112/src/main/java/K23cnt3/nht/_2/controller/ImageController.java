@@ -1,120 +1,170 @@
 package K23cnt3.nht._2.controller;
 
-import K23cnt3.nht._2.service.FileStorageService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/api/images")
 public class ImageController {
 
-    @Autowired
-    private FileStorageService fileStorageService;
+    @Value("${app.file.upload-dir:src/main/resources/static/images}")
+    private String uploadDir;
 
-    @PostMapping("/upload/product")
+    @PostMapping("/upload")
     @ResponseBody
-    public ResponseEntity<?> uploadProductImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+        Map<String, String> response = new HashMap<>();
+
         try {
+            // Kiểm tra file rỗng
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("File không được để trống");
+                response.put("error", "File is empty");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            if (!fileStorageService.isImageFile(file)) {
-                return ResponseEntity.badRequest().body("Chỉ chấp nhận file ảnh (JPG, PNG, GIF, BMP, WEBP)");
+            // Kiểm tra định dạng
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null) {
+                response.put("error", "Invalid file name");
+                return ResponseEntity.badRequest().body(response);
             }
 
-            String filePath = fileStorageService.storeProductImage(file);
+            String extension = "";
+            if (originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+            }
 
-            Map<String, String> response = new HashMap<>();
-            response.put("original", fileStorageService.getFileUrl(filePath));
-            response.put("fileName", getFileNameFromPath(filePath));
-            response.put("message", "Upload ảnh sản phẩm thành công");
+            if (!extension.matches("\\.(jpg|jpeg|png|gif)$")) {
+                response.put("error", "Only JPG, JPEG, PNG, GIF files are allowed");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Tạo tên file duy nhất
+            String uniqueFilename = UUID.randomUUID().toString() + extension;
+            Path uploadPath = Paths.get(uploadDir);
+
+            // Tạo thư mục nếu chưa tồn tại
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Lưu file
+            Path filePath = uploadPath.resolve(uniqueFilename);
+            Files.copy(file.getInputStream(), filePath);
+
+            // Trả về response
+            response.put("filename", uniqueFilename);
+            response.put("url", "/images/" + uniqueFilename);
+            response.put("message", "File uploaded successfully");
 
             return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi upload: " + e.getMessage());
+        } catch (IOException e) {
+            response.put("error", "Failed to upload file: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
 
-    @PostMapping("/upload/avatar")
+    @GetMapping("/{filename:.+}")
     @ResponseBody
-    public ResponseEntity<?> uploadAvatar(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "userType", defaultValue = "default") String userType) {
-
+    public ResponseEntity<Resource> serveImage(@PathVariable String filename) {
         try {
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("File không được để trống");
-            }
+            Path filePath = Paths.get(uploadDir).resolve(filename);
+            Resource resource = new UrlResource(filePath.toUri());
 
-            if (!fileStorageService.isImageFile(file)) {
-                return ResponseEntity.badRequest().body("Chỉ chấp nhận file ảnh (JPG, PNG, GIF, BMP, WEBP)");
-            }
+            if (resource.exists() || resource.isReadable()) {
+                String contentType = determineContentType(filename);
 
-            String filePath = fileStorageService.storeAvatar(file, userType);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("url", fileStorageService.getFileUrl(filePath));
-            response.put("fileName", getFileNameFromPath(filePath));
-            response.put("message", "Upload avatar thành công");
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi upload: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/delete")
-    @ResponseBody
-    public ResponseEntity<?> deleteImage(@RequestParam("filePath") String filePath) {
-        try {
-            boolean deleted = fileStorageService.deleteFile(filePath);
-
-            if (deleted) {
-                return ResponseEntity.ok(Map.of("message", "Xóa ảnh thành công"));
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .header(HttpHeaders.CONTENT_DISPOSITION,
+                                "inline; filename=\"" + filename + "\"")
+                        .body(resource);
             } else {
-                return ResponseEntity.badRequest().body("Không tìm thấy file để xóa");
+                return ResponseEntity.notFound().build();
             }
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi xóa ảnh: " + e.getMessage());
+        } catch (MalformedURLException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/check")
+    private String determineContentType(String filename) {
+        if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (filename.endsWith(".png")) {
+            return "image/png";
+        } else if (filename.endsWith(".gif")) {
+            return "image/gif";
+        } else {
+            return "application/octet-stream";
+        }
+    }
+
+    @DeleteMapping("/{filename:.+}")
     @ResponseBody
-    public ResponseEntity<?> checkImageExists(@RequestParam("filePath") String filePath) {
-        boolean exists = fileStorageService.isFileExists(filePath);
+    public ResponseEntity<Map<String, String>> deleteImage(@PathVariable String filename) {
+        Map<String, String> response = new HashMap<>();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("exists", exists);
-        response.put("filePath", filePath);
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(filename);
 
-        if (exists) {
-            response.put("url", fileStorageService.getFileUrl(filePath));
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                response.put("message", "File deleted successfully");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "File not found");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IOException e) {
+            response.put("error", "Failed to delete file: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
-
-        return ResponseEntity.ok(response);
     }
 
-    private String getFileNameFromPath(String filePath) {
-        if (filePath == null || filePath.isEmpty()) {
-            return "";
-        }
+    @GetMapping("/list")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> listImages() {
+        Map<String, Object> response = new HashMap<>();
 
-        int lastSlash = filePath.lastIndexOf('/');
-        if (lastSlash != -1 && lastSlash < filePath.length() - 1) {
-            return filePath.substring(lastSlash + 1);
-        }
+        try {
+            Path uploadPath = Paths.get(uploadDir);
 
-        return filePath;
+            if (Files.exists(uploadPath)) {
+                var files = Files.list(uploadPath)
+                        .filter(Files::isRegularFile)
+                        .map(path -> path.getFileName().toString())
+                        .filter(name -> name.matches(".*\\.(jpg|jpeg|png|gif)$"))
+                        .toList();
+
+                response.put("files", files);
+                response.put("count", files.size());
+                response.put("directory", uploadDir);
+
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Upload directory does not exist");
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (IOException e) {
+            response.put("error", "Failed to list files: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 }

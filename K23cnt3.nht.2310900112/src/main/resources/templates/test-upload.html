@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .upload-form { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        input[type="file"] { margin: 10px 0; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .preview { margin-top: 20px; max-width: 300px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Test Image Upload</h1>
+
+    <div class="upload-form">
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="imageFile" name="file" accept=".jpg,.jpeg,.png,.gif" required>
+            <br>
+            <button type="submit">Upload Image</button>
+        </form>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="preview">
+        <img id="previewImage" style="max-width: 100%; display: none;">
+    </div>
+
+    <div>
+        <h3>Uploaded Images:</h3>
+        <button onclick="listImages()">Refresh List</button>
+        <div id="imageList"></div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fileInput = document.getElementById('imageFile');
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = 'Uploading...';
+        messageDiv.className = '';
+
+        try {
+            const response = await fetch('/api/images/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                messageDiv.innerHTML = `✅ ${result.message}<br>URL: ${result.url}`;
+                messageDiv.className = 'success';
+
+                // Hiển thị preview
+                const previewImg = document.getElementById('previewImage');
+                previewImg.src = result.url;
+                previewImg.style.display = 'block';
+
+                // Reset form
+                fileInput.value = '';
+
+                // Refresh danh sách
+                listImages();
+            } else {
+                messageDiv.innerHTML = `❌ ${result.error}`;
+                messageDiv.className = 'error';
+            }
+        } catch (error) {
+            messageDiv.innerHTML = `❌ Error: ${error.message}`;
+            messageDiv.className = 'error';
+        }
+    });
+
+    async function listImages() {
+        try {
+            const response = await fetch('/api/images/list');
+            const result = await response.json();
+
+            const listDiv = document.getElementById('imageList');
+
+            if (response.ok) {
+                let html = `<p>Found ${result.count} images:</p>`;
+                html += '<ul>';
+
+                result.files.forEach(filename => {
+                    html += `<li>
+                        <img src="/images/${filename}" style="width: 50px; height: 50px; object-fit: cover;">
+                        ${filename}
+                        <button onclick="deleteImage('${filename}')">Delete</button>
+                    </li>`;
+                });
+
+                html += '</ul>';
+                listDiv.innerHTML = html;
+            } else {
+                listDiv.innerHTML = `<p class="error">${result.error}</p>`;
+            }
+        } catch (error) {
+            document.getElementById('imageList').innerHTML =
+                `<p class="error">Error loading images: ${error.message}</p>`;
+        }
+    }
+
+    async function deleteImage(filename) {
+        if (!confirm(`Delete ${filename}?`)) return;
+
+        try {
+            const response = await fetch(`/api/images/${filename}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Image deleted successfully');
+                listImages();
+            } else {
+                const result = await response.json();
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    }
+
+    // Load danh sách khi trang tải
+    window.onload = listImages;
+</script>
+</body>
+</html>
