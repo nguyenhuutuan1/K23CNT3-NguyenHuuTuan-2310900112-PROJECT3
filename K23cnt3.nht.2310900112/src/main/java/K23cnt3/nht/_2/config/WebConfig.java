@@ -9,13 +9,19 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Cấu hình static resources
+        // 1. Ảnh tĩnh có sẵn trong static/images/
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/");
 
+        // 2. Ảnh upload mới vào uploads/images/
+        registry.addResourceHandler("/uploaded-images/**")
+                .addResourceLocations("file:uploads/images/");
+
+        // 3. CSS
         registry.addResourceHandler("/css/**")
                 .addResourceLocations("classpath:/static/css/");
 
+        // 4. JS
         registry.addResourceHandler("/js/**")
                 .addResourceLocations("classpath:/static/js/");
     }

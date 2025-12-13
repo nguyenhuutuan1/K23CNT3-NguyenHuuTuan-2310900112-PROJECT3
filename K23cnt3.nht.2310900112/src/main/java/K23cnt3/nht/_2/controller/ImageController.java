@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequestMapping("/api/images")
 public class ImageController {
 
-    @Value("${app.file.upload-dir:src/main/resources/static/images}")
+    @Value("${app.file.upload-dir:uploads/images}")
     private String uploadDir;
 
     @PostMapping("/upload")
@@ -32,19 +32,18 @@ public class ImageController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            // Kiểm tra file rỗng
             if (file.isEmpty()) {
                 response.put("error", "File is empty");
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Kiểm tra định dạng
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null) {
                 response.put("error", "Invalid file name");
                 return ResponseEntity.badRequest().body(response);
             }
 
+            // Kiểm tra định dạng
             String extension = "";
             if (originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
@@ -68,9 +67,9 @@ public class ImageController {
             Path filePath = uploadPath.resolve(uniqueFilename);
             Files.copy(file.getInputStream(), filePath);
 
-            // Trả về response
+            // Trả về đường dẫn đúng
             response.put("filename", uniqueFilename);
-            response.put("url", "/images/" + uniqueFilename);
+            response.put("url", "/uploaded-images/" + uniqueFilename);  // Thay đổi URL
             response.put("message", "File uploaded successfully");
 
             return ResponseEntity.ok(response);
@@ -113,58 +112,6 @@ public class ImageController {
             return "image/gif";
         } else {
             return "application/octet-stream";
-        }
-    }
-
-    @DeleteMapping("/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<Map<String, String>> deleteImage(@PathVariable String filename) {
-        Map<String, String> response = new HashMap<>();
-
-        try {
-            Path filePath = Paths.get(uploadDir).resolve(filename);
-
-            if (Files.exists(filePath)) {
-                Files.delete(filePath);
-                response.put("message", "File deleted successfully");
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("error", "File not found");
-                return ResponseEntity.notFound().build();
-            }
-        } catch (IOException e) {
-            response.put("error", "Failed to delete file: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
-    }
-
-    @GetMapping("/list")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> listImages() {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            Path uploadPath = Paths.get(uploadDir);
-
-            if (Files.exists(uploadPath)) {
-                var files = Files.list(uploadPath)
-                        .filter(Files::isRegularFile)
-                        .map(path -> path.getFileName().toString())
-                        .filter(name -> name.matches(".*\\.(jpg|jpeg|png|gif)$"))
-                        .toList();
-
-                response.put("files", files);
-                response.put("count", files.size());
-                response.put("directory", uploadDir);
-
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("error", "Upload directory does not exist");
-                return ResponseEntity.badRequest().body(response);
-            }
-        } catch (IOException e) {
-            response.put("error", "Failed to list files: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
         }
     }
 }
