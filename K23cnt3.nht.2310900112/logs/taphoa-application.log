@@ -1,0 +1,262 @@
+2025-12-13 21:26:00 [main] INFO  K23cnt3.nht._2.Application - Starting Application using Java 21.0.8 with PID 29308 (D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112\target\classes started by Admin in D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112)
+2025-12-13 21:26:00 [main] DEBUG K23cnt3.nht._2.Application - Running with Spring Boot v3.4.12, Spring v6.2.14
+2025-12-13 21:26:00 [main] INFO  K23cnt3.nht._2.Application - No active profile set, falling back to 1 default profile: "default"
+2025-12-13 21:26:02 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-13 21:26:02 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table chitiethoadon (
+        macthd integer not null auto_increment,
+        don_gia decimal(18,2),
+        so_luong integer,
+        thanh_tien decimal(18,2),
+        mahd integer,
+        masp integer,
+        primary key (macthd)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table hoadon (
+        mahd integer not null auto_increment,
+        ngay_laphd date,
+        tong_tien decimal(18,2),
+        trang_thai varchar(50),
+        makh integer,
+        manv integer,
+        primary key (mahd)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table khachhang (
+        makh integer not null auto_increment,
+        dia_chi varchar(255),
+        dien_thoai varchar(20),
+        email varchar(50),
+        gioi_tinh varchar(10),
+        ho_ten varchar(100) not null,
+        ngay_sinh date,
+        primary key (makh)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table loaisanpham (
+        ma_loai integer not null auto_increment,
+        ten_loai varchar(100) not null,
+        primary key (ma_loai)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table nhacungcap (
+        mancc integer not null auto_increment,
+        dia_chi varchar(255),
+        dien_thoai varchar(20),
+        email varchar(50),
+        tenncc varchar(100) not null,
+        primary key (mancc)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table nhanvien (
+        manv integer not null auto_increment,
+        chuc_vu varchar(50),
+        dia_chi varchar(255),
+        dien_thoai varchar(20),
+        email varchar(50),
+        gioi_tinh varchar(10),
+        ho_ten varchar(100) not null,
+        luong decimal(18,2),
+        ngay_sinh date,
+        primary key (manv)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    create table sanpham (
+        masp integer not null auto_increment,
+        don_gia decimal(18,2),
+        don_vi_tinh varchar(20),
+        hinh_anh varchar(255),
+        mo_ta TEXT,
+        so_luong integer,
+        tensp varchar(150) not null,
+        ma_loai integer,
+        mancc integer,
+        primary key (masp)
+    ) engine=InnoDB
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    alter table chitiethoadon 
+       add constraint FKe39lrguesaexa2011wyknsx0o 
+       foreign key (mahd) 
+       references hoadon (mahd)
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    alter table chitiethoadon 
+       add constraint FKbfbkjnh0w65bdbmp475kccrvd 
+       foreign key (masp) 
+       references sanpham (masp)
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    alter table hoadon 
+       add constraint FKx9teb3ild3ss0o4hrl2a1t5f 
+       foreign key (makh) 
+       references khachhang (makh)
+2025-12-13 21:26:03 [main] DEBUG org.hibernate.SQL - 
+    alter table hoadon 
+       add constraint FKnwthba3sq8qk4xfr2556vci64 
+       foreign key (manv) 
+       references nhanvien (manv)
+2025-12-13 21:26:04 [main] DEBUG org.hibernate.SQL - 
+    alter table sanpham 
+       add constraint FKb1uqyegrssrtq8bbdeoq6ko6j 
+       foreign key (ma_loai) 
+       references loaisanpham (ma_loai)
+2025-12-13 21:26:04 [main] DEBUG org.hibernate.SQL - 
+    alter table sanpham 
+       add constraint FK8v3n9k5fx6ig3r9h2td7lr4yi 
+       foreign key (mancc) 
+       references nhacungcap (mancc)
+2025-12-13 21:26:05 [main] WARN  o.s.w.s.r.ResourceHandlerUtils - Appended trailing slash to static resource location: classpath:/static/favicon.ico/
+2025-12-13 21:26:05 [main] INFO  K23cnt3.nht._2.Application - Started Application in 5.563 seconds (process running for 5.866)
+2025-12-13 21:26:27 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-12-13 21:26:27 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-12-13 21:26:28 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.masp,
+        s1_0.don_gia,
+        s1_0.don_vi_tinh,
+        s1_0.hinh_anh,
+        s1_0.ma_loai,
+        s1_0.mo_ta,
+        s1_0.mancc,
+        s1_0.so_luong,
+        s1_0.tensp 
+    from
+        sanpham s1_0 
+    where
+        s1_0.so_luong>0 
+    order by
+        s1_0.masp desc
+2025-12-13 21:26:28 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        s1_0.masp,
+        s1_0.don_gia,
+        s1_0.don_vi_tinh,
+        s1_0.hinh_anh,
+        s1_0.ma_loai,
+        s1_0.mo_ta,
+        s1_0.mancc,
+        s1_0.so_luong,
+        s1_0.tensp 
+    from
+        sanpham s1_0 
+    where
+        s1_0.so_luong>0 
+    order by
+        s1_0.masp desc
+2025-12-13 21:26:28 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        l1_0.ma_loai,
+        l1_0.ten_loai 
+    from
+        loaisanpham l1_0
+2025-12-13 21:26:28 [http-nio-8080-exec-2] WARN  K.n._2.exception.ApiExceptionHandler - Runtime exception: Unable to commit against JDBC Connection
+2025-12-13 21:41:13 [main] INFO  K23cnt3.nht._2.Application - Starting Application using Java 21.0.8 with PID 21612 (D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112\target\classes started by Admin in D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112)
+2025-12-13 21:41:13 [main] DEBUG K23cnt3.nht._2.Application - Running with Spring Boot v3.4.12, Spring v6.2.14
+2025-12-13 21:41:13 [main] INFO  K23cnt3.nht._2.Application - No active profile set, falling back to 1 default profile: "default"
+2025-12-13 21:41:13 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [K23cnt3.nht._2.Application]
+2025-12-13 21:41:13 [main] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [K23cnt3.nht._2.Application]
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:194)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:418)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at K23cnt3.nht._2.Application.main(Application.java:12)
+Caused by: org.springframework.context.annotation.ConflictingBeanDefinitionException: Annotation-specified bean name 'homeController' for bean class [K23cnt3.nht._2.controller.HomeController] conflicts with existing, non-compatible bean definition of same name and class [K23cnt3.nht._2.controller.client.HomeController]
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.checkCandidate(ClassPathBeanDefinitionScanner.java:361)
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:288)
+	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128)
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:346)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:281)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:204)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:172)
+	... 13 common frames omitted
+2025-12-13 21:45:46 [main] INFO  K23cnt3.nht._2.Application - Starting Application using Java 21.0.8 with PID 4920 (D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112\target\classes started by Admin in D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112)
+2025-12-13 21:45:46 [main] DEBUG K23cnt3.nht._2.Application - Running with Spring Boot v3.4.12, Spring v6.2.14
+2025-12-13 21:45:46 [main] INFO  K23cnt3.nht._2.Application - No active profile set, falling back to 1 default profile: "default"
+2025-12-13 21:45:47 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [K23cnt3.nht._2.Application]
+2025-12-13 21:45:47 [main] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [K23cnt3.nht._2.Application]
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:194)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:418)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at K23cnt3.nht._2.Application.main(Application.java:12)
+Caused by: org.springframework.context.annotation.ConflictingBeanDefinitionException: Annotation-specified bean name 'homeController' for bean class [K23cnt3.nht._2.controller.HomeController] conflicts with existing, non-compatible bean definition of same name and class [K23cnt3.nht._2.controller.client.HomeController]
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.checkCandidate(ClassPathBeanDefinitionScanner.java:361)
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:288)
+	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128)
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:346)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:281)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:204)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:172)
+	... 13 common frames omitted
+2025-12-13 22:03:03 [main] INFO  K23cnt3.nht._2.Application - Starting Application using Java 21.0.8 with PID 25232 (D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112\target\classes started by Admin in D:\Project3\K23CNT3-NguyenHuuTuan-2310900112-PROJECT3\K23cnt3.nht.2310900112)
+2025-12-13 22:03:03 [main] DEBUG K23cnt3.nht._2.Application - Running with Spring Boot v3.4.12, Spring v6.2.14
+2025-12-13 22:03:03 [main] INFO  K23cnt3.nht._2.Application - No active profile set, falling back to 1 default profile: "default"
+2025-12-13 22:03:05 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-13 22:03:05 [main] WARN  org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-12-13 22:03:07 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'basicErrorController' method 
+org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+to { [/error]}: There is already 'errorController' bean method
+K23cnt3.nht._2.controller.ErrorController#handleError(HttpServletRequest, Model) mapped.
+2025-12-13 22:03:07 [main] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'basicErrorController' method 
+org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+to { [/error]}: There is already 'errorController' bean method
+K23cnt3.nht._2.controller.ErrorController#handleError(HttpServletRequest, Model) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:990)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at K23cnt3.nht._2.Application.main(Application.java:12)
+Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'basicErrorController' method 
+org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController#error(HttpServletRequest)
+to { [/error]}: There is already 'errorController' bean method
+K23cnt3.nht._2.controller.ErrorController#handleError(HttpServletRequest, Model) mapped.
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.validateMethodMapping(AbstractHandlerMethodMapping.java:676)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.register(AbstractHandlerMethodMapping.java:637)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.registerHandlerMethod(AbstractHandlerMethodMapping.java:331)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:507)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:84)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lambda$detectHandlerMethods$2(AbstractHandlerMethodMapping.java:298)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:986)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.detectHandlerMethods(AbstractHandlerMethodMapping.java:296)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.processCandidateBean(AbstractHandlerMethodMapping.java:265)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.initHandlerMethods(AbstractHandlerMethodMapping.java:224)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.afterPropertiesSet(AbstractHandlerMethodMapping.java:212)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.afterPropertiesSet(RequestMappingHandlerMapping.java:237)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 18 common frames omitted

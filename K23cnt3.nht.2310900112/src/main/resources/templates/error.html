@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Lỗi hệ thống</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; }
+        .error-code { font-size: 100px; color: #dc3545; }
+        .error-box { background: #f8d7da; padding: 20px; margin: 20px auto; width: 60%; border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div class="error-code" th:text="${status}">404</div>
+<h1 th:text="${error}">Not Found</h1>
+<div class="error-box">
+    <p><strong>Thông báo:</strong> <span th:text="${message}"></span></p>
+    <p><strong>Đường dẫn:</strong> <span th:text="${path}"></span></p>
+    <p><strong>Thời gian:</strong> <span th:text="${timestamp}"></span></p>
+</div>
+<div>
+    <a href="/taphoa" style="padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px;">
+        🔙 Về trang chủ
+    </a>
+</div>
+</body>
+</html>
