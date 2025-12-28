@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bảng điều khiển Admin</title>
+    <!-- CSS riêng cho admin -->
+    <link rel="stylesheet" th:href="@{/css/nht-admin.css}">
+</head>
+<body>
+
+<div class="adm-page">
+
+    <!-- Thanh trên cùng -->
+    <header class="adm-topbar">
+        <div class="adm-topbar-left">
+            <span class="adm-topbar-icon">👑</span>
+            <span class="adm-topbar-title">Admin</span>
+        </div>
+
+        <div class="adm-topbar-center">
+            <span class="adm-shop-name">
+                🛒 <span th:text="${adminName != null} ? ${adminName} : 'Quản trị viên'">Admin</span>
+                &nbsp;– Giao diện quản trị
+            </span>
+        </div>
+
+        <div class="adm-topbar-right">
+            <a th:href="@{/}" class="adm-btn-outline">Về trang khách</a>
+            <a th:href="@{/logout}" class="adm-btn-primary">Đăng xuất</a>
+        </div>
+    </header>
+
+    <div class="adm-layout">
+
+        <!-- Cột trái: menu -->
+        <aside class="adm-sidebar">
+            <div class="adm-sidebar-header">
+                <span>👑 Admin</span>
+            </div>
+
+            <nav class="adm-menu">
+                 <a th:href="@{/admin/admin-users}" class="adm-menu-item adm-menu-item--active">
+                    <span>👤 Quản lý Admin</span>
+                </a>
+                <a th:href="@{/admin/products}" class="adm-menu-item">
+                    <span>📦 Quản lý Sản phẩm</span>
+                </a>
+                <a th:href="@{/admin/customers}" class="adm-menu-item">
+                    <span>👥 Quản lý Khách hàng</span>
+                </a>
+                <a th:href="@{/admin/orders}" class="adm-menu-item">
+                    <span>🛒 Quản lý Đơn hàng</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Nội dung chính -->
+        <main class="adm-main">
+            <h1 class="adm-page-title">Bảng điều khiển</h1>
+            <p class="adm-page-subtitle">
+                Chọn chức năng bạn muốn quản lý:
+            </p>
+
+            <div class="adm-card-grid">
+                <!-- Card 1 -->
+                <a th:href="@{/admin/admin-users}" class="adm-card">
+                    <div class="adm-card-icon">👤</div>
+                    <div class="adm-card-content">
+                        <h3>Quản lý Admin</h3>
+                        <p>Thêm, sửa, xoá tài khoản quản trị.</p>
+                    </div>
+                    <div class="adm-card-arrow">➜</div>
+                </a>
+
+                <!-- Card 2 -->
+                <a th:href="@{/admin/products}" class="adm-card">
+                    <div class="adm-card-icon adm-card-icon--green">📦</div>
+                    <div class="adm-card-content">
+                        <h3>Quản lý Sản phẩm</h3>
+                        <p>Kho &amp; thông tin sản phẩm.</p>
+                    </div>
+                    <div class="adm-card-arrow">➜</div>
+                </a>
+
+                <!-- Card 3 -->
+                <a th:href="@{/admin/customers}" class="adm-card">
+                    <div class="adm-card-icon adm-card-icon--blue">👥</div>
+                    <div class="adm-card-content">
+                        <h3>Quản lý Khách hàng</h3>
+                        <p>Theo dõi &amp; CSKH.</p>
+                    </div>
+                    <div class="adm-card-arrow">➜</div>
+                </a>
+
+                <!-- Card 4 -->
+                <a th:href="@{/admin/orders}" class="adm-card">
+                    <div class="adm-card-icon adm-card-icon--orange">🛒</div>
+                    <div class="adm-card-content">
+                        <h3>Quản lý Đơn hàng</h3>
+                        <p>Đơn hàng &amp; vận chuyển.</p>
+                    </div>
+                    <div class="adm-card-arrow">➜</div>
+                </a>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

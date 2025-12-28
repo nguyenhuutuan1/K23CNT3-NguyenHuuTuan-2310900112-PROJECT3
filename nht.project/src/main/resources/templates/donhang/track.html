@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-search"></i> Tra cứu đơn hàng</h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/donhang/track}" method="get">
+                        <div class="input-group input-group-lg">
+                            <input type="text" class="form-control" name="maDonHang"
+                                   th:value="${maDonHang}"
+                                   placeholder="Nhập mã đơn hàng (VD: DH202412270001)" required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Tra cứu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Kết quả tra cứu -->
+            <div class="card mt-4" th:if="${donHang != null}">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-invoice"></i> Thông tin đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Mã đơn hàng:</strong>
+                            <p class="text-primary fs-5" th:text="${donHang.maDonHang}">DH001</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Ngày đặt:</strong>
+                            <p th:text="${donHang.formattedNgayDat}">01/01/2024</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Trạng thái đơn hàng:</strong>
+                            <p>
+                                <span class="badge bg-warning fs-6"
+                                      th:if="${donHang.trangThaiDonHang.name() == 'CHO_XU_LY'}"
+                                      th:text="${donHang.trangThaiDonHangText}">Chờ xử lý</span>
+                                <span class="badge bg-info fs-6"
+                                      th:if="${donHang.trangThaiDonHang.name() == 'DANG_GIAO'}"
+                                      th:text="${donHang.trangThaiDonHangText}">Đang giao</span>
+                                <span class="badge bg-success fs-6"
+                                      th:if="${donHang.trangThaiDonHang.name() == 'HOAN_THANH'}"
+                                      th:text="${donHang.trangThaiDonHangText}">Hoàn thành</span>
+                                <span class="badge bg-danger fs-6"
+                                      th:if="${donHang.trangThaiDonHang.name() == 'HUY'}"
+                                      th:text="${donHang.trangThaiDonHangText}">Đã hủy</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Trạng thái thanh toán:</strong>
+                            <p>
+                                <span class="badge bg-danger fs-6"
+                                      th:if="${donHang.trangThaiThanhToan.name() == 'CHUA_THANH_TOAN'}"
+                                      th:text="${donHang.trangThaiThanhToanText}">Chưa thanh toán</span>
+                                <span class="badge bg-success fs-6"
+                                      th:if="${donHang.trangThaiThanhToan.name() == 'DA_THANH_TOAN'}"
+                                      th:text="${donHang.trangThaiThanhToanText}">Đã thanh toán</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Người nhận:</strong>
+                            <p th:text="${donHang.hoTenKhachHang}">Tên</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Số điện thoại:</strong>
+                            <p th:text="${donHang.soDienThoaiKhachHang}">SĐT</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Địa chỉ giao hàng:</strong>
+                        <p th:text="${donHang.diaChiGiaoHang}">Địa chỉ</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Phương thức thanh toán:</strong>
+                        <p th:text="${donHang.phuongThucThanhToanText}">COD</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Tổng tiền:</strong>
+                        <p class="text-danger fs-4 fw-bold" th:text="${donHang.formattedTongTien}">0 đ</p>
+                    </div>
+
+                    <hr>
+
+                    <h6><i class="fas fa-list"></i> Chi tiết đơn hàng:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${donHang.chiTietList}">
+                                <td th:text="${item.tenSanPham}">Sản phẩm</td>
+                                <td class="text-center" th:text="${item.soLuong}">1</td>
+                                <td class="text-end" th:text="${item.formattedGiaBan}">0 đ</td>
+                                <td class="text-end" th:text="${item.formattedThanhTien}">0 đ</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Timeline trạng thái -->
+                    <hr>
+                    <h6><i class="fas fa-history"></i> Lịch sử đơn hàng:</h6>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span>Đơn hàng đã được đặt</span>
+                            <small class="text-muted" th:text="${donHang.formattedNgayDat}"></small>
+                        </div>
+                        <div class="timeline-item"
+                             th:if="${donHang.trangThaiDonHang.name() != 'CHO_XU_LY'}">
+                            <i class="fas fa-shipping-fast"
+                               th:classappend="${donHang.trangThaiDonHang.name() == 'DANG_GIAO' || donHang.trangThaiDonHang.name() == 'HOAN_THANH' ? 'text-success' : 'text-muted'}"></i>
+                            <span>Đang giao hàng</span>
+                        </div>
+                        <div class="timeline-item"
+                             th:if="${donHang.trangThaiDonHang.name() == 'HOAN_THANH'}">
+                            <i class="fas fa-check-double text-success"></i>
+                            <span>Giao hàng thành công</span>
+                        </div>
+                        <div class="timeline-item"
+                             th:if="${donHang.trangThaiDonHang.name() == 'HUY'}">
+                            <i class="fas fa-times-circle text-danger"></i>
+                            <span>Đơn hàng đã bị hủy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Không tìm thấy -->
+            <div class="alert alert-danger mt-4" th:if="${error != null}">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}">Lỗi</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding: 10px 0;
+        padding-left: 30px;
+    }
+
+    .timeline-item i {
+        position: absolute;
+        left: 0;
+        top: 12px;
+        font-size: 20px;
+    }
+
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 9px;
+        top: 32px;
+        width: 2px;
+        height: calc(100% - 10px);
+        background: #dee2e6;
+    }
+</style>

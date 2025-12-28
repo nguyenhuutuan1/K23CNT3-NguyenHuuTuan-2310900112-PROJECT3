@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<!-- HEADER -->
+<th:block th:replace="~{layout/NhtHeader :: nht_header}"></th:block>
+
+<div class="nht-page-wrapper">
+
+    <h2 class="nht-page-title">Thanh toán</h2>
+
+    <!-- DANH SÁCH SẢN PHẨM -->
+    <table class="nht-cart-table">
+        <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td th:text="${item.productName}"></td>
+            <td th:text="${#numbers.formatInteger(item.price,0,'POINT')} + ' đ'"></td>
+            <td th:text="${item.quantity}"></td>
+            <td th:text="${#numbers.formatInteger(item.price * item.quantity,0,'POINT')} + ' đ'"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="nht-cart-bottom" style="margin-top:16px;">
+        <div class="nht-cart-total">
+            Tổng cộng:
+            <span th:text="${#numbers.formatInteger(total,0,'POINT')} + ' đ'"></span>
+        </div>
+    </div>
+
+    <!-- FORM THANH TOÁN -->
+    <form th:action="@{/checkout}" th:object="${checkoutForm}" method="post" style="margin-top:24px;">
+
+        <!-- ERRORS -->
+        <div th:if="${#fields.hasGlobalErrors()}" class="nht-error">
+            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+        </div>
+
+        <!-- HỌ TÊN -->
+        <div class="nht-form-group">
+            <label class="nht-form-label">Họ tên *</label>
+            <div class="nht-form-control">
+                <input type="text" th:field="*{customerName}">
+                <div class="nht-field-error" th:errors="*{customerName}"></div>
+            </div>
+        </div>
+
+        <!-- PHONE -->
+        <div class="nht-form-group">
+            <label class="nht-form-label">Số điện thoại *</label>
+            <div class="nht-form-control">
+                <input type="text" th:field="*{phone}">
+                <div class="nht-field-error" th:errors="*{phone}"></div>
+            </div>
+        </div>
+
+        <!-- ĐỊA CHỈ -->
+        <div class="nht-form-group">
+            <label class="nht-form-label">Địa chỉ nhận hàng *</label>
+            <div class="nht-form-control">
+                <textarea rows="2" th:field="*{address}"></textarea>
+                <div class="nht-field-error" th:errors="*{address}"></div>
+            </div>
+        </div>
+
+        <!-- PHƯƠNG THỨC THANH TOÁN -->
+        <div class="nht-payment-box">
+            <label class="title">Phương thức thanh toán *</label>
+
+            <div class="payment-options">
+
+                <label class="option">
+                    <input type="radio" th:field="*{paymentMethod}" value="COD">
+                    Thanh toán khi nhận hàng (COD)
+                </label>
+
+                <label class="option">
+                    <input type="radio" th:field="*{paymentMethod}" value="BANK">
+                    Chuyển khoản ngân hàng
+                </label>
+
+            </div>
+
+            <!-- QR BANK -->
+            <div id="qrBox" class="qr-box" style="display:none;">
+                <p>Quét mã QR để thanh toán:</p>
+                <img src="/images/qr-bank.jpg" alt="QR Banking" class="qr-image">
+                <p class="bank-info">
+                    Ngân hàng: MB Bank <br>
+                    Chủ tài khoản: Nguyễn Hữu Tuấn <br>
+                    Nội dung: <b>Thanh toán đơn hàng</b>
+                </p>
+            </div>
+        </div>
+
+        <!-- NOTE -->
+        <div class="nht-form-group">
+            <label class="nht-form-label">Ghi chú cho shop</label>
+            <div class="nht-form-control">
+                <textarea rows="2" th:field="*{note}"></textarea>
+            </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="nht-cart-actions" style="margin-top:18px;">
+            <a th:href="@{/cart}" class="nht-btn-outline">Quay lại giỏ hàng</a>
+            <button type="submit" class="nht-btn-primary">Đặt hàng</button>
+        </div>
+
+    </form>
+</div>
+
+<!-- SCRIPT HIỂN THỊ QR -->
+<script>
+    function updateQR() {
+        const bank = document.querySelector('input[value="BANK"]');
+        const qr = document.getElementById("qrBox");
+        if (bank.checked) qr.style.display = "block";
+        else qr.style.display = "none";
+    }
+
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(r => {
+        r.addEventListener("change", updateQR);
+    });
+    updateQR();
+</script>
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

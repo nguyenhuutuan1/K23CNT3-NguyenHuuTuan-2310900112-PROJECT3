@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa đơn hàng</title>
+    <link rel="stylesheet" th:href="@{/css/nht-admin.css}">
+</head>
+<body class="nht-admin-body">
+
+<div class="nht-admin-main">
+    <div class="nht-admin-panel nht-admin-panel-sm">
+
+        <div class="nht-admin-panel-header">
+            <div>
+                <h2>Chi tiết đơn hàng</h2>
+                <p class="nht-admin-panel-sub">
+                    Cập nhật trạng thái đơn và kiểm tra thông tin khách hàng.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/admin/orders}" class="nht-admin-btn-ghost">
+                    ← Quay lại danh sách
+                </a>
+            </div>
+        </div>
+
+        <form th:action="@{/admin/orders/update}" method="post" class="nht-admin-form">
+            <input type="hidden" name="id" th:value="${order.id}"/>
+
+            <div class="nht-admin-form-group">
+                <label class="nht-admin-label">Mã đơn</label>
+                <p class="nht-admin-static" th:text="${order.id}"></p>
+            </div>
+
+            <div class="nht-admin-form-group">
+                <label class="nht-admin-label">Khách hàng</label>
+                <p class="nht-admin-static" th:text="${order.customerName}"></p>
+            </div>
+
+            <div class="nht-admin-form-group">
+                <label class="nht-admin-label">Ngày tạo</label>
+                <p class="nht-admin-static"
+                   th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></p>
+            </div>
+
+            <div class="nht-admin-form-group">
+                <label class="nht-admin-label">Tổng tiền</label>
+                <p class="nht-admin-static"
+                   th:text="${#numbers.formatInteger(order.totalAmount,0,'POINT')} + ' đ'"></p>
+            </div>
+
+            <div class="nht-admin-form-group">
+                <label class="nht-admin-label">Trạng thái</label>
+                <select name="status" class="nht-admin-input">
+                    <option th:each="entry : ${statusLabels}"
+                            th:value="${entry.key}"
+                            th:text="${entry.value}"
+                            th:selected="${entry.key} == ${order.status.name()}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="nht-admin-form-actions">
+                <a th:href="@{/admin/orders}" class="nht-admin-btn-ghost">
+                    Hủy
+                </a>
+                <button type="submit" class="nht-admin-btn">
+                    Lưu thay đổi
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

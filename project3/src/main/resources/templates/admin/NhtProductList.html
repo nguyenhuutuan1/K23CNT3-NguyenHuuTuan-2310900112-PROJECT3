@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý sản phẩm</title>
+    <link rel="stylesheet" th:href="@{/css/nht-admin.css}">
+</head>
+<body class="nht-admin-body">
+
+
+<div class="nht-admin-shell">
+    <div class="nht-admin-main">
+
+        <div class="nht-admin-panel">
+
+            <!-- HEADER PANEL -->
+            <div class="nht-admin-panel-header">
+                <div>
+                    <h2>Quản lý sản phẩm</h2>
+                    <p class="nht-admin-panel-sub">
+                        Xem, thêm mới, chỉnh sửa và xóa sản phẩm.
+                    </p>
+                </div>
+                <div>
+                    <a th:href="@{/admin/dashboard}" class="nht-admin-btn-ghost">
+                        ← Về bảng điều khiển
+                    </a>
+                    <a th:href="@{/admin/products/create}"
+                       class="nht-admin-btn nht-admin-btn-sm"
+                       style="margin-left: 8px;">
+                        + Thêm sản phẩm
+                    </a>
+                </div>
+            </div>
+
+            <!-- BẢNG SẢN PHẨM -->
+            <table class="nht-admin-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th>Mô tả</th>
+                    <th class="nht-col-actions" style="text-align: center;">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p, stat : ${products}">
+                    <td th:text="${stat.index + 1}">1</td>
+
+                    <!-- Ảnh -->
+                    <td>
+                        <img th:if="${p.image != null}"
+                             th:src="@{'/uploads/product-images/' + ${p.image}}"
+                             alt="Ảnh SP"
+                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 10px;">
+                        <span th:if="${p.image == null}" style="font-size: 12px; color: #9ca3af;">
+                            (Không có ảnh)
+                        </span>
+                    </td>
+
+                    <!-- Tên & danh mục -->
+                    <td th:text="${p.name}">Gấu bông</td>
+                    <td th:text="${p.category != null ? p.category.name : 'Chưa gán'}">Danh mục</td>
+
+                    <!-- Giá -->
+                    <td th:text="${p.price != null ? #numbers.formatDecimal(p.price, 0, 'POINT', 0, 'POINT') + ' đ' : '—'}">
+                        150.000 đ
+                    </td>
+
+                    <td>
+                        <span th:text="${p.description != null ?
+                            (#strings.length(p.description) > 60 ?
+                                  #strings.substring(p.description, 0, 60) + '...'
+                                    : p.description)
+                                : ''}">
+                        </span>
+                    </td>
+
+
+                    <!-- Thao tác -->
+                    <td style="text-align: center;">
+                        <a th:href="@{|/admin/products/edit/${p.id}|}"
+                           class="nht-admin-btn nht-admin-btn-sm">
+                            Sửa
+                        </a>
+                        <a th:href="@{|/admin/products/delete/${p.id}|}"
+                           class="nht-admin-btn nht-admin-btn-sm nht-admin-btn-danger"
+                           style="margin-left: 6px;"
+                           onclick="return confirm('Bạn chắc chắn muốn xóa sản phẩm này?');">
+                            Xóa
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(products)}">
+                    <td colspan="7" style="text-align:center; padding:18px; color:#9ca3af;">
+                        Chưa có sản phẩm nào.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

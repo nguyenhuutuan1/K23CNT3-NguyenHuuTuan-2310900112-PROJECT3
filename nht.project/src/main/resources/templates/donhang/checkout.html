@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-4">
+    <h2><i class="fas fa-credit-card"></i> Thanh toán đơn hàng</h2>
+    <hr>
+
+    <form th:action="@{/donhang/create}" method="post">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin người nhận</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="hoTen"
+                                       th:value="${khachHang != null ? khachHang.hoTen : ''}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" name="soDienThoai"
+                                       th:value="${khachHang != null ? khachHang.soDienThoai : ''}"
+                                       pattern="[0-9]{10}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email"
+                                   th:value="${khachHang != null ? khachHang.email : ''}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="diaChiGiaoHang" rows="3" required
+                                      th:text="${khachHang != null ? khachHang.diaChi : ''}"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Phương thức thanh toán</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="phuongThucThanhToan"
+                                   id="tienMat" value="TIEN_MAT" checked required>
+                            <label class="form-check-label" for="tienMat">
+                                <i class="fas fa-money-bill-alt text-success"></i>
+                                <strong>Tiền mặt khi nhận hàng (COD)</strong>
+                                <p class="text-muted small mb-0">Thanh toán trực tiếp cho nhân viên giao hàng</p>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="phuongThucThanhToan"
+                                   id="chuyenKhoan" value="CHUYEN_KHOAN" required>
+                            <label class="form-check-label" for="chuyenKhoan">
+                                <i class="fas fa-university text-primary"></i>
+                                <strong>Chuyển khoản ngân hàng</strong>
+                                <p class="text-muted small mb-0">Chuyển khoản trước, giao hàng sau khi xác nhận</p>
+                            </label>
+                        </div>
+
+                        <div id="bankInfo" class="alert alert-info mt-3" style="display: none;">
+                            <h6><i class="fas fa-info-circle"></i> Thông tin chuyển khoản:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Ngân hàng:</strong> MB Bank (Quân Đội)</p>
+                                    <p class="mb-1"><strong>Số tài khoản:</strong> 0328942958</p>
+                                    <p class="mb-1"><strong>Chủ tài khoản:</strong> NGUYEN HUU TUAN</p>
+                                    <p class="mb-0"><strong>Nội dung:</strong> [Mã đơn hàng] Ho ten</p>
+                                </div>
+                                <div class="col-md-6 text-center">
+                                    <p class="mb-2"><strong>Quét mã QR để chuyển khoản:</strong></p>
+                                    <img th:src="@{/images/qr-mbbank.jpg}"
+                                         alt="QR Code MB Bank"
+                                         class="img-fluid"
+                                         style="max-width: 200px;"
+                                         onerror="this.style.display='none'">
+                                    <p class="small text-muted mt-2">Quét mã bằng app MB Bank</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <label class="form-label"><i class="fas fa-comment"></i> Ghi chú (không bắt buộc)</label>
+                        <textarea class="form-control" name="ghiChu" rows="3"
+                                  placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay địa điểm giao hàng chi tiết hơn."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Đơn hàng của bạn</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Giá</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${cart}">
+                                    <td>
+                                        <small th:text="${item.tenSanPham}">Sản phẩm</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span th:text="${item.soLuong}">1</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <small th:text="${#numbers.formatDecimal(item.thanhTien, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</small>
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th colspan="2">Tổng cộng:</th>
+                                    <th class="text-end text-danger">
+                                        <span th:text="${#numbers.formatDecimal(tongTien, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</span>
+                                    </th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                Tôi đã đọc và đồng ý với <a href="#">điều khoản</a> của cửa hàng
+                            </label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle"></i> Đặt hàng
+                            </button>
+                            <a th:href="@{/giohang}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại giỏ hàng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chuyenKhoan = document.getElementById('chuyenKhoan');
+        const tienMat = document.getElementById('tienMat');
+        const bankInfo = document.getElementById('bankInfo');
+
+        chuyenKhoan.addEventListener('change', function() {
+            if (this.checked) {
+                bankInfo.style.display = 'block';
+            }
+        });
+
+        tienMat.addEventListener('change', function() {
+            if (this.checked) {
+                bankInfo.style.display = 'none';
+            }
+        });
+    });
+</script>

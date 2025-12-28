@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/sanpham}">Sản phẩm</a></li>
+            <li class="breadcrumb-item active" th:text="${title}">Danh sách</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sidebar Categories -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-list"></i> Danh mục sản phẩm
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a th:href="@{/sanpham}" class="text-decoration-none"
+                           th:classappend="${selectedDanhMuc == null ? 'fw-bold text-primary' : ''}">
+                            <i class="fas fa-th"></i> Tất cả sản phẩm
+                        </a>
+                    </li>
+                    <li class="list-group-item" th:each="dm : ${danhMucs}">
+                        <a th:href="@{/sanpham/danhmuc/{id}(id=${dm.id})}"
+                           class="text-decoration-none"
+                           th:classappend="${selectedDanhMuc != null && selectedDanhMuc.id == dm.id ? 'fw-bold text-primary' : ''}">
+                            <i class="fas fa-angle-right"></i> <span th:text="${dm.tenDanhMuc}">Danh mục</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Price Filter -->
+            <div class="card mt-3">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-filter"></i> Lọc theo giá
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/sanpham/filter}" method="get">
+                        <input type="hidden" name="danhMucId" th:value="${selectedDanhMuc != null ? selectedDanhMuc.id : ''}">
+                        <div class="mb-3">
+                            <label class="form-label">Giá từ:</label>
+                            <input type="number" class="form-control" name="minPrice" th:value="${minPrice}" placeholder="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Đến:</label>
+                            <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}" placeholder="1000000">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Lọc
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products List -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3><i class="fas fa-shopping-bag"></i> <span th:text="${title}">Sản phẩm</span></h3>
+                <span class="text-muted" th:if="${sanPhams != null}">
+                    Tìm thấy <strong th:text="${sanPhams.size()}">0</strong> sản phẩm
+                </span>
+            </div>
+
+            <div th:if="${sanPhams == null || sanPhams.isEmpty()}" class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Không tìm thấy sản phẩm nào.
+            </div>
+
+            <div class="row g-3" th:if="${sanPhams != null && !sanPhams.isEmpty()}">
+                <div class="col-md-4" th:each="sp : ${sanPhams}">
+                    <div class="card h-100">
+                        <a th:href="@{/sanpham/{id}(id=${sp.id})}" class="text-decoration-none">
+                            <img th:src="${sp.hinhAnh != null ? sp.hinhAnh : 'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=' + sp.tenSanPham}"
+                                 class="card-img-top" th:alt="${sp.tenSanPham}"
+                                 style="height: 200px; object-fit: cover;">
+                        </a>
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a th:href="@{/sanpham/{id}(id=${sp.id})}"
+                                   class="text-decoration-none text-dark"
+                                   th:text="${sp.tenSanPham}">Tên sản phẩm</a>
+                            </h6>
+                            <p class="text-muted small mb-1" th:text="${sp.danhMuc.tenDanhMuc}">Danh mục</p>
+                            <p class="text-danger fw-bold fs-5 mb-2"
+                               th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">Giá</p>
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-box"></i> Còn: <span th:text="${sp.soLuongTon}">0</span>
+                            </p>
+                            <div th:if="${sp.soLuongTon <= 0}" class="badge bg-danger">Hết hàng</div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/sanpham/{id}(id=${sp.id})}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                                <form th:action="@{/giohang/add}" method="post" class="add-to-cart-form">
+                                    <input type="hidden" name="sanPhamId" th:value="${sp.id}">
+                                    <input type="hidden" name="soLuong" value="1">
+                                    <button type="submit" class="btn btn-primary btn-sm w-100"
+                                            th:disabled="${sp.soLuongTon <= 0}">
+                                        <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>

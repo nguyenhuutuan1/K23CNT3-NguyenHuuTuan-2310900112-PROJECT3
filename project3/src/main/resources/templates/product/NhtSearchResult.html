@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả tìm kiếm</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<section class="nht-section">
+    <h2>Kết quả tìm kiếm cho: "<span th:text="${keyword}"></span>"</h2>
+
+    <div class="nht-product-grid">
+        <div class="nht-product-card" th:each="p : ${products}">
+            <a th:href="@{'/product/' + ${p.id}}">
+                <img th:src="@{'/uploads/product-images/' + ${p.image}}" alt="">
+                <h4 th:text="${p.name}"></h4>
+                <p class="price"
+                   th:text="${#numbers.formatInteger(p.price,0,'POINT')} + ' đ'"></p>
+            </a>
+        </div>
+    </div>
+
+    <p th:if="${#lists.isEmpty(products)}">Không tìm thấy sản phẩm nào </p>
+</section>
+
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+</body>
+</html>

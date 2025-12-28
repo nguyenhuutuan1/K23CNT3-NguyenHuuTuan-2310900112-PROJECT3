@@ -1,0 +1,535 @@
+/* ====== NỀN CHUNG ====== */
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #1b2439 0, #050815 55%, #02030a 100%);
+    color: #e5ecff;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.adm-page {
+    min-height: 100vh;
+    padding: 24px 40px;
+    box-sizing: border-box;
+}
+
+/* ====== TOP BAR ====== */
+
+.adm-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(20, 26, 46, 0.95), rgba(19, 31, 64, 0.95));
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    margin: 0 auto 24px auto;
+    max-width: 1180px;
+}
+
+.adm-topbar-left,
+.adm-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.adm-topbar-center {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    color: #c7d2ff;
+}
+
+.adm-topbar-icon {
+    font-size: 20px;
+}
+
+.adm-topbar-title {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.adm-shop-name {
+    font-weight: 500;
+}
+
+/* ====== BUTTON ====== */
+
+.adm-btn-primary,
+.adm-btn-outline {
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 0;
+    outline: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.adm-btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #f9fafb;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.5);
+}
+
+.adm-btn-primary:hover {
+    filter: brightness(1.08);
+}
+
+.adm-btn-outline {
+    border: 1px solid rgba(148, 163, 254, 0.8);
+    color: #e5e7eb;
+    background: rgba(15, 23, 42, 0.7);
+}
+
+.adm-btn-outline:hover {
+    background: rgba(30, 64, 175, 0.7);
+}
+
+/* ====== LAYOUT ====== */
+
+.adm-layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 22px;
+    align-items: flex-start;
+}
+
+/* ====== SIDEBAR ====== */
+
+.adm-sidebar {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(17, 24, 39, 0.95));
+    border-radius: 20px;
+    padding: 16px 14px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+}
+
+.adm-sidebar-header {
+    padding: 10px 14px 14px;
+    font-weight: 600;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.6);
+    color: #f9fafb;
+}
+
+.adm-menu {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.adm-menu-item {
+    padding: 11px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    color: #cbd5f5;
+    background: transparent;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adm-menu-item:hover {
+    background: rgba(31, 41, 84, 0.9);
+    border-color: rgba(79, 70, 229, 0.6);
+}
+
+.adm-menu-item--active {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(129, 140, 248, 0.9));
+    color: #f9fafb;
+    border-color: transparent;
+}
+
+/* ====== MAIN CONTENT ====== */
+
+.adm-main {
+    background: radial-gradient(circle at top left, rgba(30, 64, 175, 0.28), rgba(15, 23, 42, 0.98));
+    border-radius: 24px;
+    padding: 22px 24px 28px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+}
+
+.adm-page-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.adm-page-subtitle {
+    margin: 8px 0 18px;
+    font-size: 14px;
+    color: #cbd5f5;
+}
+
+/* ====== CARDS ====== */
+
+.adm-card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.adm-card {
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 20px;
+    padding: 16px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px;
+    position: relative;
+    border: 1px solid rgba(55, 65, 81, 0.9);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.9);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.adm-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 46px rgba(59, 130, 246, 0.45);
+    border-color: rgba(96, 165, 250, 0.9);
+}
+
+.adm-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 130, 246, 0.15);
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.adm-card-icon--green {
+    background: rgba(34, 197, 94, 0.14);
+}
+
+.adm-card-icon--blue {
+    background: rgba(56, 189, 248, 0.14);
+}
+
+.adm-card-icon--orange {
+    background: rgba(251, 146, 60, 0.16);
+}
+
+.adm-card-content h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.adm-card-content p {
+    margin: 0;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.adm-card-arrow {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    font-size: 18px;
+    color: #9ca3ff;
+}
+
+/* ====== RESPONSIVE ====== */
+
+@media (max-width: 1000px) {
+    .adm-layout {
+        grid-template-columns: 220px minmax(0, 1fr);
+    }
+
+    .adm-card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 780px) {
+    .adm-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .adm-topbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .adm-topbar-center {
+        order: 3;
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    .adm-card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================== ADMIN THEME CHUNG ================== */
+
+.nht-admin-body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at 0 0, #1f2937 0%, #020617 55%, #020617 100%);
+    color: #e5e7eb;
+}
+
+/* Nếu bạn đã có .nht-admin-shell / .nht-admin-main thì bỏ qua 2 đoạn dưới */
+.nht-admin-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+}
+
+.nht-admin-main {
+    flex: 1;
+    padding: 24px 32px;
+}
+
+/* Panel bao ngoài nội dung trang con (orders, products,...) */
+.nht-admin-panel {
+    max-width: 1180px;
+    margin: 0 auto;
+    background: radial-gradient(circle at top left, #111827 0%, #020617 60%);
+    border-radius: 20px;
+    padding: 24px 24px 28px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+/* header nhỏ trên panel */
+.nht-admin-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.nht-admin-panel-header h2 {
+    font-size: 22px;
+    margin: 0 0 4px 0;
+    color: #f9fafb;
+}
+
+.nht-admin-panel-sub {
+    margin: 0;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* nút ghost "Về bảng điều khiển" */
+.nht-admin-btn-ghost {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    color: #e5e7eb;
+    font-size: 13px;
+    text-decoration: none;
+    background: transparent;
+    transition: background 0.2s, border-color 0.2s, transform 0.1s;
+}
+.nht-admin-btn-ghost:hover {
+    background: rgba(148, 163, 184, 0.15);
+    border-color: rgba(129, 140, 248, 0.7);
+    transform: translateY(-1px);
+}
+
+/* ================== TABLE ĐƠN HÀNG ================== */
+
+.nht-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    background: #020617;
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.nht-admin-table thead {
+    background: rgba(15, 23, 42, 0.95);
+}
+
+.nht-admin-table th,
+.nht-admin-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+}
+
+.nht-admin-table th {
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9ca3af;
+}
+
+.nht-admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.nht-admin-table tbody tr:hover {
+    background: rgba(55, 65, 81, 0.55);
+}
+
+/* cột thao tác hẹp hơn */
+.nht-col-actions {
+    width: 150px;
+    white-space: nowrap;
+}
+
+/* ================== BUTTON TRONG BẢNG ================== */
+
+.nht-admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #f9fafb;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.5);
+    transition: transform 0.1s, box-shadow 0.1s, opacity 0.15s;
+}
+
+.nht-admin-btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.nht-admin-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.8);
+}
+
+.nht-admin-btn-danger {
+    background: linear-gradient(135deg, #f97373, #ef4444);
+    box-shadow: 0 4px 10px rgba(248, 113, 113, 0.45);
+}
+
+/* ================== BADGE TRẠNG THÁI ================== */
+
+.nht-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    background: rgba(31, 41, 55, 0.9);
+    color: #e5e7eb;
+}
+
+/* tuỳ enum của bạn: WAIT_CONFIRM, SHIPPING, DONE, CANCEL */
+.nht-badge-WAIT_CONFIRM {
+    background: rgba(59, 130, 246, 0.18);
+    color: #60a5fa;
+}
+.nht-badge-SHIPPING {
+    background: rgba(34, 197, 94, 0.14);
+    color: #4ade80;
+}
+.nht-badge-DONE {
+    background: rgba(45, 212, 191, 0.16);
+    color: #5eead4;
+}
+.nht-badge-CANCEL {
+    background: rgba(248, 113, 113, 0.16);
+    color: #fca5a5;
+}
+
+/* ====== ADMIN ORDER EDIT ====== */
+
+.nht-admin-panel-sm {
+    max-width: 640px;
+    margin: 24px auto;
+    padding: 22px 26px 26px;
+}
+
+.nht-admin-form {
+    margin-top: 10px;
+}
+
+.nht-admin-form-group {
+    margin-bottom: 14px;
+}
+
+.nht-admin-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9caecf;
+    margin-bottom: 4px;
+}
+
+.nht-admin-static {
+    margin: 0;
+    color: #e5ecff;
+    font-size: 14px;
+}
+
+.nht-admin-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #2f3c5a;
+    background: #020b17;
+    color: #e5ecff;
+    font-size: 14px;
+    outline: none;
+}
+
+.nht-admin-input:focus {
+    border-color: #6b8bff;
+    box-shadow: 0 0 0 1px rgba(107, 139, 255, 0.4);
+}
+
+.nht-admin-form-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* reuse nút admin */
+.nht-admin-btn-ghost {
+    border-radius: 999px;
+    padding: 7px 16px;
+    border: 1px solid #354466;
+    background: transparent;
+    color: #e0e7ff;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nht-admin-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+}

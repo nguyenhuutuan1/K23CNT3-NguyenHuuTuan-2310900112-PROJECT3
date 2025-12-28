@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liên hệ tạp hóa NHT</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<!-- HEADER -->
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<div class="contact-wrapper">
+
+    <h2 class="contact-title">Liên hệ với tạp hóa NHT</h2>
+
+    <p class="contact-sub">Chúng mình luôn sẵn sàng nhận đơn hàng bạn mong muốn</p>
+
+    <div class="contact-box">
+
+        <!-- Thông tin shop -->
+        <div class="contact-info">
+            <h3>Thông tin liên hệ</h3>
+            <p><b>📍 Địa chỉ:</b> Hà Nội, Việt Nam</p>
+            <p><b>📞 Hotline:</b> 0328942958</p>
+            <p><b>📧 Email:</b> huutuansans@gmail.com</p>
+            <p><b>🌐 Facebook:</b>
+                <a href="https://www.facebook.com/sans.tuan.969" target="_blank">Hữu Tuấn</a>
+            </p>
+        </div>
+
+        <!-- Form gửi tin nhắn -->
+        <div class="contact-form">
+
+            <h3>Gửi tin nhắn cho shop</h3>
+
+            <form>
+
+                <label>Họ tên</label>
+                <input type="text" placeholder="Nhập họ tên của bạn">
+
+                <label>Email</label>
+                <input type="email" placeholder="Email để shop phản hồi">
+
+                <label>Nội dung tin nhắn</label>
+                <textarea rows="4" placeholder="Bạn muốn nhắn gì với shop?"></textarea>
+
+                <button type="submit" class="contact-btn">Gửi tin nhắn</button>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!-- FOOTER -->
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

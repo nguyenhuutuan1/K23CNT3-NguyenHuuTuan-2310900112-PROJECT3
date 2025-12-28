@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                    <h5 th:text="${khachHang.hoTen}">Tên khách hàng</h5>
+                    <p class="text-muted mb-0" th:text="${khachHang.email}">email@example.com</p>
+                </div>
+            </div>
+
+            <div class="list-group mt-3">
+                <a href="#thongtin" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="fas fa-user"></i> Thông tin cá nhân
+                </a>
+                <a href="#doimatkhau" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-key"></i> Đổi mật khẩu
+                </a>
+                <a th:href="@{/donhang/list}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-shopping-bag"></i> Đơn hàng của tôi
+                </a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Tab Thông tin cá nhân -->
+                <div class="tab-pane fade show active" id="thongtin">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-user"></i> Thông tin cá nhân</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/khachhang/profile/update}" method="post" th:object="${khachHang}">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{hoTen}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" th:field="*{email}" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" th:field="*{soDienThoai}"
+                                               pattern="[0-9]{10}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Ngày tạo tài khoản</label>
+                                        <input type="text" class="form-control"
+                                               th:value="${#temporals.format(khachHang.ngayTao, 'dd/MM/yyyy HH:mm')}"
+                                               readonly>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Địa chỉ</label>
+                                    <textarea class="form-control" th:field="*{diaChi}" rows="3"></textarea>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Cập nhật thông tin
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Đổi mật khẩu -->
+                <div class="tab-pane fade" id="doimatkhau">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-key"></i> Đổi mật khẩu</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/khachhang/change-password}" method="post" id="changePasswordForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu hiện tại <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" name="oldPassword"
+                                           placeholder="Nhập mật khẩu hiện tại" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" name="newPassword" id="newPassword"
+                                           placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" minlength="6" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" name="confirmPassword" id="confirmPasswordProfile"
+                                           placeholder="Nhập lại mật khẩu mới" minlength="6" required>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Mật khẩu phải có ít nhất 6 ký tự và nên bao gồm chữ hoa, chữ thường và số.
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-key"></i> Đổi mật khẩu
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPasswordProfile').value;
+
+        if (newPassword !== confirmPassword) {
+            e.preventDefault();
+            alert('Mật khẩu xác nhận không khớp!');
+            return false;
+        }
+    });
+</script>

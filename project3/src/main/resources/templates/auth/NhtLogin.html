@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<div class="auth-container">
+    <h2>Đăng nhập</h2>
+
+    <form th:action="@{/login}" method="post">
+
+        <!-- ⭐ HIDDEN FIELD giữ lại trang cần quay về -->
+        <input type="hidden" name="redirect" th:value="${redirect}">
+
+        <label>Email</label>
+        <input type="text" name="email">
+
+        <label>Mật khẩu</label>
+        <input type="password" name="password">
+
+        <button type="submit" class="auth-btn">Đăng nhập</button>
+    </form>
+
+    <div class="auth-switch">
+        Chưa có tài khoản?
+        <a th:href="@{/register}">Đăng ký ngay</a>
+    </div>
+</div>
+
+</body>
+</html>

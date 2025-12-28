@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Danh mục: ' + ${currentCategory.name}">Danh mục</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+
+<!-- ===== HEADER (DÙNG TEMPLATE CHUNG) ===== -->
+<th:block th:replace="~{layout/NhtHeader :: nht_header}"></th:block>
+
+<!-- CATEGORY NAV -->
+<section class="nht-category-bar">
+    <div class="nht-category-list">
+
+        <!-- Trang chủ -->
+        <a th:href="@{/}"
+           th:class="'nht-category-link' + (${activeCategoryId} == 0 ? ' nht-category-active' : '')">
+            Trang chủ
+        </a>
+
+        <!-- Category từ DB -->
+        <a th:each="c : ${categories}"
+           th:href="@{'/category/' + ${c.id}}"
+           th:text="${c.name}"
+           th:class="'nht-category-link' + (${activeCategoryId} == c.id ? ' nht-category-active' : '')">
+        </a>
+
+    </div>
+</section>
+
+<!-- BREADCRUMB CHUẨN -->
+<div class="nht-breadcrumb">
+    <a href="/" class="crumb">Trang chủ</a>
+    <span>/</span>
+    <a th:href="@{'/category/' + ${currentCategory.id}}" class="crumb"
+       th:text="${currentCategory.name}"></a>
+</div>
+
+<!-- TIÊU ĐỀ -->
+<section class="nht-section">
+    <h2 th:text="'Danh mục: ' + ${currentCategory.name}"></h2>
+</section>
+
+<!-- PRODUCT LIST -->
+<section class="nht-section">
+    <div class="nht-product-grid">
+
+        <div class="nht-product-card" th:each="p : ${products}">
+            <a th:href="@{'/product/' + ${p.id}}">
+
+                <!-- Ảnh -->
+                <img th:src="@{'/uploads/product-images/' + ${p.image}}" alt="" class="nht-product-img">
+
+                <!-- Tên -->
+                <h4 th:text="${p.name}"></h4>
+
+                <!-- Giá -->
+                <p class="price"
+                   th:text="${#numbers.formatInteger(p.price, 0, 'POINT')} + ' đ'"></p>
+
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đơn hàng của tôi</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<div class="nht-page-wrapper">
+
+    <h2 class="nht-page-title">Đơn hàng của bạn</h2>
+
+    <div th:if="${orders.isEmpty()}">
+        <p>Bạn chưa có món hàng nào </p>
+    </div>
+
+    <div th:each="order : ${orders}" class="order-card">
+
+        <h3>Mã đơn: <span th:text="${order.id}"></span></h3>
+
+        <p><b>Ngày đặt:</b>
+            <span th:text="${order.createdAt}"></span>
+        </p>
+
+        <p><b>Tổng tiền:</b>
+            <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'POINT')} + ' đ'"></span>
+        </p>
+
+        <p><b>Trạng thái:</b>
+            <span th:text="${order.status.viLabel}"></span>
+        </p>
+
+
+    </div>
+
+</div>
+
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

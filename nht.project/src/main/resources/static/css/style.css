@@ -1,0 +1,241 @@
+// Tạp Hóa NHT - Main JavaScript
+
+// Initialize carousel with auto slide
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.querySelector('#heroCarousel');
+    if (carousel) {
+        new bootstrap.Carousel(carousel, {
+            interval: 3000, // 3 seconds
+            wrap: true,
+            keyboard: true,
+            pause: 'hover'
+        });
+    }
+
+    // Auto dismiss alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+});
+
+// Format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount);
+}
+
+// Add to cart with AJAX
+document.querySelectorAll('.add-to-cart-ajax').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const form = this.closest('form');
+        const formData = new FormData(form);
+
+        fetch('/giohang/add-ajax', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart count
+                updateCartCount(data.data);
+
+                // Show success message
+                showToast('success', data.message);
+            } else {
+                showToast('error', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('error', 'Có lỗi xảy ra!');
+        });
+    });
+});
+
+// Update cart count
+function updateCartCount(count) {
+    const cartBadge = document.querySelector('.navbar .badge');
+    if (cartBadge) {
+        cartBadge.textContent = count;
+        if (count > 0) {
+            cartBadge.style.display = 'inline';
+        } else {
+            cartBadge.style.display = 'none';
+        }
+    }
+}
+
+// Show toast notification
+function showToast(type, message) {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '9999';
+        document.body.appendChild(container);
+    }
+
+    const toastId = 'toast-' + Date.now();
+    const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+    const toastHTML = `
+        <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas ${icon}"></i> ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('toastContainer').insertAdjacentHTML('beforeend', toastHTML);
+
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+
+    // Remove toast after hidden
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
+}
+
+// Confirm delete
+document.querySelectorAll('[data-confirm]').forEach(element => {
+    element.addEventListener('click', function(e) {
+        const message = this.getAttribute('data-confirm') || 'Bạn có chắc chắn?';
+        if (!confirm(message)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+
+// Number input validation
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('input', function() {
+        if (this.value < 0) {
+            this.value = 0;
+        }
+        if (this.max && parseInt(this.value) > parseInt(this.max)) {
+            this.value = this.max;
+        }
+    });
+});
+
+// Image lazy loading
+if ('loading' in HTMLImageElement.prototype) {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(img => {
+        img.src = img.dataset.src;
+    });
+} else {
+    // Fallback for browsers that don't support lazy loading
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js';
+    document.body.appendChild(script);
+}
+
+// Back to top button
+const backToTopButton = document.createElement('button');
+backToTopButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+backToTopButton.className = 'btn btn-primary position-fixed bottom-0 end-0 m-3';
+backToTopButton.style.display = 'none';
+backToTopButton.style.zIndex = '9999';
+backToTopButton.onclick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+document.body.appendChild(backToTopButton);
+
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        backToTopButton.style.display = 'block';
+    } else {
+        backToTopButton.style.display = 'none';
+    }
+});
+
+// Search with Enter key
+const searchInput = document.querySelector('input[name="keyword"]');
+if (searchInput) {
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            this.closest('form').submit();
+        }
+    });
+}
+
+// Quantity buttons
+document.querySelectorAll('.quantity-minus').forEach(button => {
+    button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input[type="number"]');
+        if (input.value > input.min) {
+            input.value = parseInt(input.value) - 1;
+            input.dispatchEvent(new Event('change'));
+        }
+    });
+});
+
+document.querySelectorAll('.quantity-plus').forEach(button => {
+    button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input[type="number"]');
+        if (!input.max || parseInt(input.value) < parseInt(input.max)) {
+            input.value = parseInt(input.value) + 1;
+            input.dispatchEvent(new Event('change'));
+        }
+    });
+});
+
+// Price range slider (if needed)
+const priceRange = document.getElementById('priceRange');
+if (priceRange) {
+    priceRange.addEventListener('input', function() {
+        document.getElementById('priceValue').textContent = formatCurrency(this.value);
+    });
+}
+
+// Product image zoom (on detail page)
+const productImage = document.querySelector('.product-image');
+if (productImage) {
+    productImage.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const xPercent = (x / rect.width) * 100;
+        const yPercent = (y / rect.height) * 100;
+
+        this.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+        this.style.transform = 'scale(1.5)';
+    });
+
+    productImage.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+    });
+}
+
+// Form validation feedback
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+
+console.log('Tạp Hóa NHT - Loaded successfully!');

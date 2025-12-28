@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
+        <h2>Đặt hàng thành công!</h2>
+        <p class="lead">Cảm ơn bạn đã đặt hàng tại Tạp Hóa NHT</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-invoice"></i> Thông tin đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Mã đơn hàng:</strong>
+                            <p class="text-primary fs-5" th:text="${donHang.maDonHang}">DH001</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Ngày đặt:</strong>
+                            <p th:text="${donHang.formattedNgayDat}">01/01/2024</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Người nhận:</strong>
+                            <p th:text="${donHang.hoTenKhachHang}">Tên</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Số điện thoại:</strong>
+                            <p th:text="${donHang.soDienThoaiKhachHang}">SĐT</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Địa chỉ giao hàng:</strong>
+                        <p th:text="${donHang.diaChiGiaoHang}">Địa chỉ</p>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Phương thức thanh toán:</strong>
+                            <p><span class="badge bg-info" th:text="${donHang.phuongThucThanhToanText}">COD</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Trạng thái:</strong>
+                            <p>
+                                <span class="badge bg-warning" th:text="${donHang.trangThaiDonHangText}">Chờ xử lý</span>
+                                <span class="badge bg-danger" th:text="${donHang.trangThaiThanhToanText}">Chưa thanh toán</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6><i class="fas fa-list"></i> Chi tiết đơn hàng:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${donHang.chiTietList}">
+                                <td th:text="${item.tenSanPham}">Sản phẩm</td>
+                                <td class="text-center" th:text="${item.soLuong}">1</td>
+                                <td class="text-end" th:text="${item.formattedGiaBan}">0 đ</td>
+                                <td class="text-end" th:text="${item.formattedThanhTien}">0 đ</td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Tổng cộng:</th>
+                                <th class="text-end text-danger fs-5" th:text="${donHang.formattedTongTien}">0 đ</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info mt-3" th:if="${donHang.phuongThucThanhToan.name() == 'CHUYEN_KHOAN'}">
+                        <h6><i class="fas fa-info-circle"></i> Thông tin chuyển khoản:</h6>
+                        <p class="mb-1"><strong>Ngân hàng:</strong> MB Bank (Quân Đội)</p>
+                        <p class="mb-1"><strong>Số tài khoản:</strong> 0328942958</p>
+                        <p class="mb-1"><strong>Chủ tài khoản:</strong> NGUYEN HUU TUAN</p>
+                        <p class="mb-1"><strong>Nội dung:</strong> <span th:text="${donHang.maDonHang}">DH001</span> <span th:text="${donHang.hoTenKhachHang}">Ten</span></p>
+                        <hr>
+                        <p class="text-center mb-1"><strong>Quét mã QR để chuyển khoản:</strong></p>
+                        <div class="text-center">
+                            <img th:src="@{/images/qr-mbbank.jpg}"
+                                 alt="QR Code MB Bank"
+                                 class="img-fluid"
+                                 style="max-width: 250px;"
+                                 onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a th:href="@{/}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Về trang chủ
+                        </a>
+                        <a th:href="@{/donhang/{id}(id=${donHang.id})}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-invoice"></i> Xem đơn hàng
+                        </a>
+                        <a th:href="@{/sanpham}" class="btn btn-outline-secondary">
+                            <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success mt-3">
+                <h6><i class="fas fa-bell"></i> Lưu ý:</h6>
+                <ul class="mb-0">
+                    <li>Vui lòng lưu lại mã đơn hàng để tra cứu</li>
+                    <li>Đơn hàng sẽ được xử lý và giao trong vòng 24h</li>
+                    <li>Bạn có thể tra cứu đơn hàng bằng mã đơn hàng</li>
+                    <li th:if="${donHang.phuongThucThanhToan.name() == 'CHUYEN_KHOAN'}">
+                        Vui lòng chuyển khoản trong 24h để được xử lý đơn hàng
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>

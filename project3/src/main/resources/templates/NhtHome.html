@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nht Teddy Shop - Trang chủ</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<!-- ===== HEADER (DÙNG TEMPLATE CHUNG) ===== -->
+<th:block th:replace="~{layout/NhtHeader :: nht_header}"></th:block>
+
+
+<!-- ========== BANNER RIÊNG ========== -->
+<section class="nht-banner">
+    <img src="/images/banner2.jpg" alt="Banner" class="home-banner">
+</section>
+
+
+<!-- ========== CATEGORY BAR (PHÂN LOẠI SẢN PHẨM) ========== -->
+<section class="nht-category-bar">
+    <div class="nht-category-list">
+        <div class="nht-breadcrumb">
+            <a href="/" class="crumb">Trang chủ </a>
+            <a href="/category/1" class="crumb">mì</a>
+            <a href="/category/2" class="crumb">nước </a>
+            <a href="/category/3" class="crumb">bim bim</a>
+            <a href="/category/4" class="crumb">dầu ăn</a>
+            <a href="/category/5" class="crumb">nước mắm</a>
+            <a href="/category/6" class="crumb">đồ hộp</a>
+            <a href="/category/6" class="crumb">gạo</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ========== SẢN PHẨM NỔI BẬT ========== -->
+<section class="nht-section">
+    <h3 class="nht-section-title">Sản phẩm nổi bật</h3>
+
+    <div class="nht-product-grid">
+
+        <div class="nht-product-card" th:each="p : ${products}">
+            <a th:href="@{'/product/' + ${p.id}}">
+
+                <!-- Ảnh sản phẩm -->
+                <img th:src="@{'/uploads/product-images/' + ${p.image}}" alt="Ảnh sản phẩm">
+
+                <!-- Tên sản phẩm -->
+                <h4 th:text="${p.name}"></h4>
+
+                <!-- Giá -->
+                <p class="price"
+                   th:text="${#numbers.formatInteger(p.price, 0, 'POINT')} + ' đ'">
+                </p>
+
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ===== FOOTER ===== -->
+<div th:insert="~{layout/NhtFooter :: nht_footer}"></div>
+
+</body>
+</html>

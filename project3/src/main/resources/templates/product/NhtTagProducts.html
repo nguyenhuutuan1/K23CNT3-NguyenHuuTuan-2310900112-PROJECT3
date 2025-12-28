@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${displayName}">Danh sách sản phẩm</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<!-- HEADER -->
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<!-- BREADCRUMB -->
+<div class="nht-breadcrumb">
+    <a href="/" class="crumb">Trang chủ</a>
+    <span>/</span>
+    <span th:text="${displayName}">Danh mục</span>
+</div>
+
+<!-- TIÊU ĐỀ -->
+<section class="nht-section">
+    <h2 th:text="${displayName}">Sản phẩm</h2>
+</section>
+
+<!-- LIST SẢN PHẨM -->
+<section class="nht-section">
+    <div class="nht-product-grid">
+
+        <div class="nht-product-card"
+             th:each="p : ${products}">
+            <a th:href="@{'/product/' + ${p.id}}">
+
+                <img th:src="@{'/uploads/product-images/' + ${p.image}}"
+                     class="nht-product-img"
+                     alt="Ảnh sản phẩm">
+
+                <h4 th:text="${p.name}"></h4>
+
+                <p class="price"
+                   th:text="${#numbers.formatInteger(p.price,0,'POINT')} + ' đ'">
+                </p>
+
+            </a>
+        </div>
+
+        <p th:if="${#lists.isEmpty(products)}"
+           style="text-align:center; width:100%; padding:20px;">
+            Không có sản phẩm nào trong mục này
+        </p>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

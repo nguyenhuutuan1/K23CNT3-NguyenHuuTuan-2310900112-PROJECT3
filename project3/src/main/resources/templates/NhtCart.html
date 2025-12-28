@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<!-- HEADER -->
+<th:block th:replace="~{layout/NhtHeader :: nht_header}"></th:block>
+
+<section class="nht-section">
+    <div class="nht-page-wrapper">
+
+        <h2 class="nht-page-title">Giỏ hàng của bạn</h2>
+
+        <!-- Giỏ hàng trống -->
+        <div th:if="${#lists.isEmpty(items)}" class="nht-cart-empty">
+            <span>Giỏ hàng hiện đang trống.</span>
+            <a th:href="@{/}" class="nht-btn-primary nht-btn-sm">Tiếp tục mua sắm</a>
+        </div>
+
+        <!-- Giỏ hàng có sản phẩm -->
+        <div th:unless="${#lists.isEmpty(items)}">
+
+            <table class="nht-cart-table">
+                <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th style="width: 140px;">Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="item : ${items}">
+
+                    <!-- Tên sản phẩm -->
+                    <td>
+                        <span class="nht-cart-product-name"
+                              th:text="${item.productName}"></span>
+                    </td>
+
+                    <!-- Giá đơn -->
+                    <td th:text="${#numbers.formatInteger(item.price, 0, 'POINT')} + ' đ'"></td>
+
+                    <!-- Số lượng + Update -->
+                    <td>
+                        <form th:action="@{/cart/update}" method="post" class="nht-cart-form-inline">
+                            <input type="hidden" name="productId" th:value="${item.productId}">
+                            <input type="number" name="quantity"
+                                   th:value="${item.quantity}"
+                                   min="1" class="nht-qty-input">
+                            <button type="submit" class="nht-btn-outline nht-btn-xs">Cập nhật</button>
+                        </form>
+                    </td>
+
+                    <!-- Thành tiền -->
+                    <td th:text="${#numbers.formatInteger(item.price * item.quantity, 0, 'POINT')} + ' đ'"></td>
+
+                    <!-- Xóa -->
+                    <td>
+                        <form th:action="@{/cart/remove}" method="post">
+                            <input type="hidden" name="productId" th:value="${item.productId}">
+                            <button type="submit" class="nht-btn-link">Xóa</button>
+                        </form>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Tổng tiền -->
+            <div class="nht-cart-bottom">
+
+                <div class="nht-cart-total">
+                    Tổng cộng:
+                    <span th:text="${#numbers.formatInteger(total, 0, 'POINT')} + ' đ'"></span>
+                </div>
+
+                <div class="nht-cart-actions">
+                    <a th:href="@{/}" class="nht-cart-btn nht-cart-btn-outline">
+                        Tiếp tục mua sắm
+                    </a>
+
+                    <a th:href="@{/checkout}" class="nht-cart-btn nht-cart-btn-primary">
+                        Thanh toán
+                    </a>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

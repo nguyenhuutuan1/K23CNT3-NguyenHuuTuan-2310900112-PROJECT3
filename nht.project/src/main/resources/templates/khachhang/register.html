@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus fa-4x text-primary mb-3"></i>
+                        <h3>Đăng ký tài khoản</h3>
+                        <p class="text-muted">Tạo tài khoản để mua sắm dễ dàng hơn</p>
+                    </div>
+
+                    <form th:action="@{/khachhang/register}" method="post" th:object="${khachHang}">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-user"></i> Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{hoTen}"
+                                   placeholder="Nhập họ và tên" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" th:field="*{email}"
+                                   placeholder="Nhập email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-phone"></i> Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" th:field="*{soDienThoai}"
+                                   placeholder="Nhập số điện thoại" pattern="[0-9]{10}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
+                            <textarea class="form-control" th:field="*{diaChi}"
+                                      rows="2" placeholder="Nhập địa chỉ"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-lock"></i> Mật khẩu <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" th:field="*{matKhau}"
+                                   placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" minlength="6" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-lock"></i> Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirmPassword"
+                                   placeholder="Nhập lại mật khẩu" minlength="6" required>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Đăng ký
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="mb-0">
+                                Đã có tài khoản?
+                                <a th:href="@{/khachhang/login}">Đăng nhập</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a th:href="@{/}" class="text-decoration-none">
+                    <i class="fas fa-arrow-left"></i> Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.querySelector('[name="matKhau"]').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Mật khẩu xác nhận không khớp!');
+            return false;
+        }
+    });
+</script>

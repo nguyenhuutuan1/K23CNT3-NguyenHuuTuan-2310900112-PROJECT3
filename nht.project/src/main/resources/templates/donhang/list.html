@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<div class="container my-4">
+    <h2><i class="fas fa-list"></i> Đơn hàng của tôi</h2>
+    <hr>
+
+    <div th:if="${donHangs == null || donHangs.isEmpty()}" class="text-center py-5">
+        <i class="fas fa-shopping-bag fa-5x text-muted mb-3"></i>
+        <h4>Bạn chưa có đơn hàng nào</h4>
+        <p class="text-muted">Hãy bắt đầu mua sắm ngay!</p>
+        <a th:href="@{/sanpham}" class="btn btn-primary">
+            <i class="fas fa-shopping-bag"></i> Mua sắm ngay
+        </a>
+    </div>
+
+    <div th:if="${donHangs != null && !donHangs.isEmpty()}">
+        <div class="card mb-3" th:each="dh : ${donHangs}">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <strong>Mã đơn hàng:</strong><br>
+                        <span class="text-primary" th:text="${dh.maDonHang}">DH001</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Ngày đặt:</strong><br>
+                        <span th:text="${#temporals.format(dh.ngayDat, 'dd/MM/yyyy HH:mm')}">01/01/2024</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Tổng tiền:</strong><br>
+                        <span class="text-danger fw-bold"
+                              th:text="${#numbers.formatDecimal(dh.tongTien, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Trạng thái:</strong><br>
+                        <span class="badge bg-warning"
+                              th:if="${dh.trangThaiDonHang.name() == 'CHO_XU_LY'}"
+                              th:text="${dh.trangThaiDonHang.moTa}">Chờ xử lý</span>
+                        <span class="badge bg-info"
+                              th:if="${dh.trangThaiDonHang.name() == 'DANG_GIAO'}"
+                              th:text="${dh.trangThaiDonHang.moTa}">Đang giao</span>
+                        <span class="badge bg-success"
+                              th:if="${dh.trangThaiDonHang.name() == 'HOAN_THANH'}"
+                              th:text="${dh.trangThaiDonHang.moTa}">Hoàn thành</span>
+                        <span class="badge bg-danger"
+                              th:if="${dh.trangThaiDonHang.name() == 'HUY'}"
+                              th:text="${dh.trangThaiDonHang.moTa}">Đã hủy</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end">Thành tiền</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="ct : ${dh.chiTietDonHangs}">
+                            <td th:text="${ct.sanPham.tenSanPham}">Sản phẩm</td>
+                            <td class="text-center" th:text="${ct.soLuong}">1</td>
+                            <td class="text-end"
+                                th:text="${#numbers.formatDecimal(ct.giaBan, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                            <td class="text-end"
+                                th:text="${#numbers.formatDecimal(ct.thanhTien, 0, 'COMMA', 0, 'POINT')} + ' đ'">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-danger"
+                              th:if="${dh.trangThaiThanhToan.name() == 'CHUA_THANH_TOAN'}"
+                              th:text="${dh.trangThaiThanhToan.moTa}">Chưa thanh toán</span>
+                        <span class="badge bg-success"
+                              th:if="${dh.trangThaiThanhToan.name() == 'DA_THANH_TOAN'}"
+                              th:text="${dh.trangThaiThanhToan.moTa}">Đã thanh toán</span>
+                        <span class="ms-2" th:text="${dh.phuongThucThanhToan.moTa}">COD</span>
+                    </div>
+                    <div>
+                        <a th:href="@{/donhang/{id}(id=${dh.id})}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> Chi tiết
+                        </a>
+                        <form th:if="${dh.trangThaiDonHang.name() == 'CHO_XU_LY'}"
+                              th:action="@{/donhang/{id}/cancel(id=${dh.id})}"
+                              method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                    onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
+                                <i class="fas fa-times"></i> Hủy đơn
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>

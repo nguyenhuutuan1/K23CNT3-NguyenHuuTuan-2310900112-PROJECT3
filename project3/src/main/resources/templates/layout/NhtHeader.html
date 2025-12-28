@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Header</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<header class="nht-header" th:fragment="nht_header">
+
+    <!-- HÀNG TRÊN: LOGO + SEARCH + HOTLINE + CART + LOGIN -->
+    <div class="header-top">
+
+        <!-- Logo -->
+        <div class="top-left">
+            <a th:href="@{/}">
+                <img class="nht-logo-img" th:src="@{/images/logo.jpg}" alt="Logo NHT Teddy">
+            </a>
+        </div>
+
+        <!-- Thanh tìm kiếm -->
+        <div class="top-search">
+            <form class="search-form" th:action="@{/search}" method="get">
+                <input type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..." required>
+                <button type="submit">Tìm</button>
+            </form>
+        </div>
+
+        <!-- Hotline + Giỏ hàng + Đăng nhập -->
+        <div class="top-right">
+
+            <div class="hotline">
+                Hotline: <span>0328942958</span>
+            </div>
+
+            <a th:href="@{/cart}" class="cart-icon" title="Giỏ hàng">
+                🛒
+            </a>
+
+            <!-- Nếu chưa đăng nhập -->
+            <div th:if="${session.currentUser == null}">
+                <a th:href="@{/login}" class="btn-auth">Đăng nhập</a>
+            </div>
+
+            <!-- Nếu đã đăng nhập -->
+            <div th:if="${session.currentUser != null}" class="logged-wrap">
+                <span class="user-name" th:text="'Xin chào, ' + ${session.currentUser.fullName}">Xin chào</span>
+
+               <button>  <a th:if="${session.currentUser.role.name() == 'ADMIN'}"
+                   th:href="@{/admin/dashboard}" class="btn-link">Quản trị</a>
+               </button>
+                <a th:if="${session.currentUser.role.name() == 'SHIPPER'}"
+                   th:href="@{/ship/orders}" class="btn-link">Đơn giao</a>
+
+                <a th:href="@{/logout}" class="btn-auth">Đăng xuất</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- HÀNG DƯỚI: MENU + KHẨU HIỆU + MENU PHẢI -->
+    <nav class="nht-main-menu">
+
+        <!-- Bên trái -->
+        <div class="menu-left">
+            <a th:href="@{/}" class="menu-item">Trang chủ</a>
+        </div>
+
+        <!-- Menu bên phải -->
+        <div class="menu-right">
+            <a href="/promotion" class="menu-item">Khuyến mại</a>
+            <a href="/service" class="menu-item">Dịch vụ</a>
+            <a href="/contact" class="menu-item">Liên hệ</a>
+            <a th:href="@{/my-orders}" class="menu-item">Theo dõi đơn</a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+</body>
+</html>

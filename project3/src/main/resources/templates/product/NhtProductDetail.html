@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.name}">Chi tiết sản phẩm</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body class="product-detail-page">
+
+<!-- HEADER -->
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<!-- BREADCRUMB -->
+<div class="nht-breadcrumb">
+    <a th:href="@{/}">Trang chủ</a>
+    <span>/</span>
+    <span th:text="${product.name}"></span>
+</div>
+
+<section class="nht-detail-wrap">
+
+    <!-- ẢNH SẢN PHẨM -->
+    <div class="nht-detail-img-wrap">
+        <img class="detail-img"
+             th:src="@{/uploads/product-images/{img}(img=${product.image})}">
+    </div>
+
+    <!-- THÔNG TIN -->
+    <div class="detail-info">
+        <h2 th:text="${product.name}"></h2>
+
+        <p class="price"
+           th:text="${#numbers.formatInteger(product.price,0,'POINT')} + ' đ'"></p>
+
+        <p class="nht-detail-desc" th:text="${product.description}"></p>
+
+        <div class="nht-benefit-wrap">
+            <ul class="nht-benefit-list">
+                <li>100% hàng nhập từ việt nam</li>
+                <li>Có đóng gói cẩn thận</li>
+            </ul>
+            <ul class="nht-benefit-list">
+                <li>Ảnh chụp thật</li>
+                <li>Miễn phí ship</li>
+            </ul>
+        </div>
+
+        <form th:action="@{'/cart/add/' + ${product.id}}" method="post">
+            <button class="btn-primary">Thêm vào giỏ hàng</button>
+        </form>
+    </div>
+</section>
+
+<!-- ========== COMMENT / REVIEW ========== -->
+<section class="nht-detail-extra">
+
+    <div class="nht-review-section">
+        <h3>Đánh giá khách hàng</h3>
+
+        <!-- FORM GỬI COMMENT (CHỈ HIỆN KHI ĐÃ ĐĂNG NHẬP) -->
+        <form class="review-form"
+              th:if="${currentUser != null}"
+              th:action="@{'/product/' + ${product.id} + '/comment'}"
+              method="post">
+
+            <label>Đánh giá của bạn</label>
+
+            <select name="star" required>
+                <option value="5">★★★★★ - Rất tốt</option>
+                <option value="4">★★★★☆ - Tốt</option>
+                <option value="3">★★★☆☆ - Bình thường</option>
+                <option value="2">★★☆☆☆ - Kém</option>
+                <option value="1">★☆☆☆☆ - Rất tệ</option>
+            </select>
+
+            <textarea name="content"
+                      placeholder="Viết đánh giá của bạn..."
+                      required></textarea>
+
+            <button type="submit">Gửi đánh giá</button>
+        </form>
+
+        <!-- NẾU CHƯA ĐĂNG NHẬP -->
+        <p th:if="${currentUser == null}" style="font-size:14px;">
+            Vui lòng <a th:href="@{/login}">đăng nhập</a> để đánh giá sản phẩm.
+        </p>
+
+        <!-- DANH SÁCH COMMENT -->
+        <div class="nht-review-card"
+             th:each="c : ${comments}">
+
+            <div class="nht-review-header">
+                <span th:text="${c.user.fullName}"></span>
+                <span class="nht-review-stars"
+                      th:text="${'★'.repeat(c.star)}"></span>
+            </div>
+
+            <p th:text="${c.content}"></p>
+
+            <small th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></small>
+        </div>
+
+        <!-- NẾU CHƯA CÓ COMMENT -->
+        <p th:if="${#lists.isEmpty(comments)}"
+           style="font-size:14px; color:#9ca3af;">
+            Chưa có đánh giá nào cho sản phẩm này.
+        </p>
+
+    </div>
+</section>
+
+<div th:insert="~{layout/NhtFooter :: nht_footer}"></div>
+
+</body>
+</html>

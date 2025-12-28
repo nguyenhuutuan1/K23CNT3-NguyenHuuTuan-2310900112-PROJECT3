@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đặt hàng thành công</title>
+    <link rel="stylesheet" th:href="@{/css/nht-style.css}">
+</head>
+<body>
+
+<!-- HEADER -->
+<th:block th:replace="layout/NhtHeader :: nht_header"></th:block>
+
+<div class="nht-page-wrapper">
+
+    <h2 class="nht-page-title">Đặt hàng thành công</h2>
+
+    <p style="text-align: center; margin-bottom: 16px;">
+        Cảm ơn <strong th:text="${order.customerName}">bạn</strong> đã tin tưởng tạp hóa NHT<br>
+        Đơn hàng của bạn đã được ghi nhận, chúng mình sẽ liên hệ xác nhận sớm nhất.
+    </p>
+
+    <!-- Thông tin đơn hàng + khách -->
+    <div class="nht-cart-bottom" style="align-items: flex-start; margin-top: 10px;">
+        <div>
+            <p><strong>Mã đơn hàng:</strong> <span th:text="${order.id}">1</span></p>
+            <p>
+                <strong>Ngày đặt:</strong>
+                <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">01/12/2025 12:00</span>
+            </p>
+            <p>
+                <strong>Trạng thái:</strong>
+                <span class="nht-order-status-badge"
+                      th:text="${order.status}">Đang chờ xác nhận</span>
+            </p>
+        </div>
+
+        <div>
+            <p><strong>Khách hàng:</strong> <span th:text="${order.customerName}">Tên khách</span></p>
+            <p><strong>Số điện thoại:</strong> <span th:text="${order.phone}">0123456789</span></p>
+            <p><strong>Địa chỉ giao hàng:</strong> <span th:text="${order.address}">Địa chỉ</span></p>
+            <p th:if="${order.note != null and !#strings.isEmpty(order.note)}">
+                <strong>Ghi chú:</strong> <span th:text="${order.note}"></span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Bảng chi tiết sản phẩm -->
+    <h3 class="nht-section-title" style="margin-top: 24px;">Chi tiết sản phẩm</h3>
+
+    <table class="nht-cart-table">
+        <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th style="width: 80px;">SL</th>
+            <th>Thành tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${order.items}">
+            <td>
+                <span class="nht-cart-product-name"
+                      th:text="${item.productName}">mì</span>
+            </td>
+            <td th:text="${#numbers.formatInteger(item.productPrice, 0, 'POINT')} + ' đ'">5.000 đ</td>
+            <td th:text="${item.quantity}">1</td>
+            <td th:text="${#numbers.formatInteger(item.productPrice * item.quantity, 0, 'POINT')} + ' đ'">5.000 đ</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Tổng tiền + nút -->
+    <div class="nht-cart-bottom">
+        <div class="nht-cart-total">
+            Tổng thanh toán:
+            <span th:text="${#numbers.formatInteger(order.totalAmount, 0, 'POINT')} + ' đ'">5.000 đ</span>
+        </div>
+
+        <div class="nht-cart-actions">
+            <a th:href="@{/}" class="nht-btn-outline">Tiếp tục mua sắm</a>
+            <!-- Sau này làm trang tra cứu đơn hàng thì thêm link ở đây -->
+            <!--
+            <a th:href="@{'/order/track'(id=${order.id})}" class="nht-btn-primary">Theo dõi đơn hàng</a>
+            -->
+        </div>
+    </div>
+
+    <p style="margin-top: 16px; font-size: 14px; color: #666; text-align: center;">
+        khi nhận được hàng hãy xác nhận với shop bằng cách gọi
+        hãy kiểm kỹ hàng hóa
+    </p>
+
+</div>
+<th:block th:replace="layout/NhtFooter :: nht_footer"></th:block>
+
+</body>
+</html>

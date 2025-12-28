@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title + ' - Tạp Hóa NHT' : 'Tạp Hóa NHT'}">Tạp Hóa NHT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+            <img th:src="@{/images/logo.png}" alt="Logo" height="40" class="me-2"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+            <span><i class="fas fa-store"></i> Tạp Hóa NHT</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">
+                        <i class="fas fa-home"></i> Trang chủ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/sanpham}">
+                        <i class="fas fa-shopping-bag"></i> Sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/donhang/track}">
+                        <i class="fas fa-search"></i> Tra cứu đơn hàng
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Search Form -->
+            <form class="d-flex me-3" th:action="@{/search}" method="get">
+                <input class="form-control me-2" type="search" name="keyword" placeholder="Tìm sản phẩm..." style="width: 250px;">
+                <button class="btn btn-outline-light" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <ul class="navbar-nav">
+                <!-- Cart -->
+                <li class="nav-item">
+                    <a class="nav-link position-relative" th:href="@{/giohang}">
+                        <i class="fas fa-shopping-cart"></i> Giỏ hàng
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                              th:if="${cartCount != null && cartCount > 0}"
+                              th:text="${cartCount}">0</span>
+                    </a>
+                </li>
+
+                <!-- User Info & Logout (when logged in) -->
+                <li class="nav-item" th:if="${session.khachHang != null}">
+                    <a class="nav-link" th:href="@{/khachhang/profile}">
+                        <i class="fas fa-user-circle"></i> <span th:text="${session.khachHang.hoTen}">Tài khoản</span>
+                    </a>
+                </li>
+
+                <!-- Admin Link (only for admin) -->
+                <li class="nav-item" th:if="${session.khachHang != null && session.khachHang.role == 'ADMIN'}">
+                    <a class="nav-link bg-warning text-dark px-3 rounded" th:href="@{/admin}">
+                        <i class="fas fa-crown"></i> <strong>Admin</strong>
+                    </a>
+                </li>
+
+                <!-- Logout Button -->
+                <li class="nav-item" th:if="${session.khachHang != null}">
+                    <a class="nav-link text-danger fw-bold" th:href="@{/khachhang/logout}">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                </li>
+
+                <!-- Login Button (when not logged in) -->
+                <li class="nav-item" th:if="${session.khachHang == null}">
+                    <a class="nav-link" th:href="@{/khachhang/login}">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Flash Messages -->
+<div class="container mt-3" th:if="${success != null || error != null}">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${success != null}">
+        <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error != null}">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
