@@ -104,15 +104,21 @@ public class DonHangController {
     public String confirmOrder(@PathVariable Long id, Model model, HttpSession session) {
         log.info("Xem xác nhận đơn hàng ID: {}", id);
 
-        DonHang donHang = donHangService.getDonHangById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+        try {
+            DonHang donHang = donHangService.getDonHangById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
 
-        DonHangResponse response = donHangService.convertToResponse(donHang);
+            DonHangResponse response = donHangService.convertToResponse(donHang);
 
-        model.addAttribute("donHang", response);
-        model.addAttribute("cartCount", gioHangService.demSoLuong(session));
+            model.addAttribute("donHang", response);
+            model.addAttribute("cartCount", gioHangService.demSoLuong(session));
 
-        return "donhang/confirm";
+            return "donhang/confirm";
+
+        } catch (Exception e) {
+            log.error("Lỗi khi xem đơn hàng: {}", e.getMessage(), e);
+            return "redirect:/";
+        }
     }
 
     /**
@@ -138,26 +144,50 @@ public class DonHangController {
 
     /**
      * Chi tiết đơn hàng
+     * ✅ ĐÃ SỬA: Logic kiểm tra quyền an toàn hơn
      */
     @GetMapping("/{id}")
     public String detailOrder(@PathVariable Long id, Model model, HttpSession session) {
         log.info("Xem chi tiết đơn hàng ID: {}", id);
 
-        DonHang donHang = donHangService.getDonHangById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+        try {
+            DonHang donHang = donHangService.getDonHangById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
 
-        // Kiểm tra quyền xem
-        KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
-        if (khachHang != null && !donHang.getKhachHang().getId().equals(khachHang.getId())) {
+            // ✅ SỬA: Kiểm tra quyền xem AN TOÀN HƠN
+            KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
+
+            // Nếu là admin, cho xem tất cả
+            boolean isAdmin = khachHang != null && "ADMIN".equals(khachHang.getRole());
+
+            // Nếu không phải admin, kiểm tra có phải chủ đơn hàng không
+            if (!isAdmin) {
+                // Nếu đơn hàng có khách hàng
+                if (donHang.getKhachHang() != null) {
+                    // Phải đăng nhập và phải là chủ đơn hàng
+                    if (khachHang == null || !donHang.getKhachHang().getId().equals(khachHang.getId())) {
+                        log.warn("Người dùng {} cố truy cập đơn hàng {} không thuộc về họ",
+                                khachHang != null ? khachHang.getId() : "guest", id);
+                        return "redirect:/";
+                    }
+                }
+                // Nếu đơn hàng không có khách hàng (khách vãng lai) thì ai cũng xem được
+            }
+
+            DonHangResponse response = donHangService.convertToResponse(donHang);
+
+            model.addAttribute("donHang", response);
+            model.addAttribute("cartCount", gioHangService.demSoLuong(session));
+
+            return "donhang/detail";
+
+        } catch (IllegalArgumentException e) {
+            log.error("Không tìm thấy đơn hàng: {}", e.getMessage());
+            return "redirect:/";
+        } catch (Exception e) {
+            log.error("Lỗi khi xem chi tiết đơn hàng: {}", e.getMessage(), e);
             return "redirect:/";
         }
-
-        DonHangResponse response = donHangService.convertToResponse(donHang);
-
-        model.addAttribute("donHang", response);
-        model.addAttribute("cartCount", gioHangService.demSoLuong(session));
-
-        return "donhang/detail";
     }
 
     /**
@@ -202,8 +232,12 @@ public class DonHangController {
 
             // Kiểm tra quyền hủy
             KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
-            if (khachHang != null && !donHang.getKhachHang().getId().equals(khachHang.getId())) {
-                throw new IllegalStateException("Không có quyền hủy đơn hàng này");
+
+            // Kiểm tra an toàn
+            if (donHang.getKhachHang() != null) {
+                if (khachHang == null || !donHang.getKhachHang().getId().equals(khachHang.getId())) {
+                    throw new IllegalStateException("Không có quyền hủy đơn hàng này");
+                }
             }
 
             donHangService.huyDonHang(id);

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{layout/header :: head}"></div>
+<div th:replace="~{layout/header :: body}"></div>
+
+<!-- Main Content -->
+<div class="container my-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-tags text-primary"></i> Quản lý Danh mục</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Danh mục</li>
+                </ol>
+            </nav>
+        </div>
+        <a th:href="@{/admin}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Về Dashboard
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="fas fa-plus"></i> Thêm danh mục mới
+            </button>
+            <span class="ms-3 text-muted">
+                <i class="fas fa-info-circle"></i> Tổng số: <strong th:text="${danhMucs != null ? danhMucs.size() : 0}">0</strong> danh mục
+            </span>
+        </div>
+    </div>
+
+    <!-- Danh sách danh mục -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Danh sách danh mục</h5>
+        </div>
+        <div class="card-body">
+            <!-- Empty State -->
+            <div th:if="${danhMucs == null || danhMucs.isEmpty()}" class="text-center py-5">
+                <i class="fas fa-inbox fa-5x text-muted mb-3"></i>
+                <h5 class="text-muted">Chưa có danh mục nào</h5>
+                <p class="text-muted">Hãy thêm danh mục đầu tiên để bắt đầu!</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus"></i> Thêm danh mục ngay
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div th:if="${danhMucs != null && !danhMucs.isEmpty()}">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="25%">Tên danh mục</th>
+                            <th width="40%">Mô tả</th>
+                            <th width="12%" class="text-center">Số sản phẩm</th>
+                            <th width="13%" class="text-center">Ngày tạo</th>
+                            <th width="15%" class="text-center">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="dm, iter : ${danhMucs}">
+                            <td><strong th:text="${iter.count}">1</strong></td>
+                            <td>
+                                <i class="fas fa-tag text-primary"></i>
+                                <strong th:text="${dm.tenDanhMuc}">Danh mục</strong>
+                            </td>
+                            <td>
+                                    <span th:text="${dm.moTa != null && !dm.moTa.isEmpty() ? dm.moTa : 'Chưa có mô tả'}"
+                                          class="text-muted"></span>
+                            </td>
+                            <td class="text-center">
+                                    <span class="badge bg-info"
+                                          th:text="${dm.danhSachSanPham != null ? dm.danhSachSanPham.size() : 0}">0</span>
+                            </td>
+                            <td class="text-center">
+                                <small th:text="${#temporals.format(dm.ngayTao, 'dd/MM/yyyy')}">01/01/2024</small>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal"
+                                            th:data-id="${dm.id}"
+                                            th:data-ten="${dm.tenDanhMuc}"
+                                            th:data-mota="${dm.moTa}"
+                                            onclick="editDanhMuc(this)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form th:action="@{/admin/danhmuc/{id}/delete(id=${dm.id})}"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm danh mục -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addModalLabel">
+                    <i class="fas fa-plus"></i> Thêm danh mục mới
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/admin/danhmuc/create}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Tên danh mục <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               name="tenDanhMuc"
+                               placeholder="Ví dụ: Đồ uống, Bánh kẹo..."
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control"
+                                  name="moTa"
+                                  rows="3"
+                                  placeholder="Mô tả về danh mục này..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Đóng
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu danh mục
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Sửa danh mục -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="editModalLabel">
+                    <i class="fas fa-edit"></i> Sửa danh mục
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editId" name="id">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Tên danh mục <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="editTenDanhMuc"
+                               name="tenDanhMuc"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control"
+                                  id="editMoTa"
+                                  name="moTa"
+                                  rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Đóng
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save"></i> Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    function editDanhMuc(button) {
+        // Get data from button attributes
+        const id = button.getAttribute('data-id');
+        const ten = button.getAttribute('data-ten');
+        const moTa = button.getAttribute('data-mota') || '';
+
+        // Set action URL
+        document.getElementById('editForm').action = '/admin/danhmuc/' + id + '/update';
+
+        // Fill form data
+        document.getElementById('editId').value = id;
+        document.getElementById('editTenDanhMuc').value = ten;
+        document.getElementById('editMoTa').value = moTa;
+    }
+</script>
+
+<style>
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .btn-group .btn {
+        border-radius: 0;
+    }
+
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .modal-header {
+        border-bottom: 3px solid rgba(0,0,0,0.1);
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+</style>
+
+</html>

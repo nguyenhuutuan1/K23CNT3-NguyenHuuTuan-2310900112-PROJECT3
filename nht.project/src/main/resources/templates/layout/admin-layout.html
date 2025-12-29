@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- ============================================ -->
+<!-- ADMIN HEAD FRAGMENT -->
+<!-- ============================================ -->
+<head th:fragment="admin-head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title + ' - Admin NHT' : 'Admin - Tạp Hóa NHT'}">Admin NHT</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* ===== GLOBAL ADMIN STYLES ===== */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* ===== ADMIN SIDEBAR ===== */
+        .admin-sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            padding: 0;
+        }
+
+        .admin-sidebar .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-sidebar .sidebar-header h5 {
+            color: #fff;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .admin-sidebar .nav {
+            padding: 15px 0;
+        }
+
+        .admin-sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 25px;
+            margin: 3px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .admin-sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .admin-sidebar .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .admin-sidebar .nav-link i {
+            width: 25px;
+            text-align: center;
+            margin-right: 8px;
+        }
+
+        .admin-sidebar hr {
+            border-color: rgba(255,255,255,0.1);
+            margin: 15px 20px;
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .admin-main-content {
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .admin-page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .admin-page-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .admin-page-header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+
+        /* ===== CARDS ===== */
+        .admin-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        .admin-card .card-header {
+            background: #fff;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+
+        /* ===== TABLES ===== */
+        .admin-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .admin-table table {
+            margin: 0;
+        }
+
+        .admin-table thead th {
+            background: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            padding: 15px;
+        }
+
+        .admin-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            padding: 6px 12px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                position: relative;
+                min-height: auto;
+            }
+
+            .admin-main-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<!-- ============================================ -->
+<!-- ADMIN SIDEBAR FRAGMENT -->
+<!-- ============================================ -->
+<div th:fragment="admin-sidebar(activePage)">
+    <div class="admin-sidebar">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+            <h5>
+                <i class="fas fa-crown text-warning"></i>
+                <span class="ms-2">ADMIN NHT</span>
+            </h5>
+        </div>
+
+        <!-- Navigation Menu -->
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'dashboard' ? 'active' : ''}"
+                   th:href="@{/admin}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'sanpham' ? 'active' : ''}"
+                   th:href="@{/admin/sanpham}">
+                    <i class="fas fa-box"></i> Quản lý sản phẩm
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'donhang' ? 'active' : ''}"
+                   th:href="@{/admin/donhang}">
+                    <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'khachhang' ? 'active' : ''}"
+                   th:href="@{/admin/khachhang}">
+                    <i class="fas fa-users"></i> Quản lý người dùng
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${activePage == 'danhmuc' ? 'active' : ''}"
+                   th:href="@{/admin/danhmuc}">
+                    <i class="fas fa-tags"></i> Quản lý danh mục
+                </a>
+            </li>
+
+            <li><hr></li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}">
+                    <i class="fas fa-home"></i> Về trang chủ
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" th:href="@{/khachhang/logout}">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- ADMIN ALERTS FRAGMENT -->
+<!-- ============================================ -->
+<div th:fragment="admin-alerts">
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Thành công!</strong> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <strong>Lỗi!</strong> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${info}" class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="fas fa-info-circle me-2"></i>
+        <span th:text="${info}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- ADMIN FOOTER SCRIPTS -->
+<!-- ============================================ -->
+<div th:fragment="admin-scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        // Confirm delete actions
+        function confirmDelete(message) {
+            return confirm(message || 'Bạn có chắc chắn muốn xóa?');
+        }
+    </script>
+</div>
+
+</html>

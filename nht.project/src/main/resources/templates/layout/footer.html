@@ -1,39 +1,111 @@
-<!-- Footer -->
-<footer class="bg-primary text-white mt-5 py-4" xmlns:th="http://www.w3.org/1999/xhtml">
-    <div class="container">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- ============================================ -->
+<!-- FOOTER FRAGMENT -->
+<!-- ============================================ -->
+<footer th:fragment="footer" class="bg-dark text-white mt-5">
+    <div class="container py-5">
         <div class="row">
-            <div class="col-md-4">
+            <!-- About Section -->
+            <div class="col-md-3">
                 <h5><i class="fas fa-store"></i> Tạp Hóa NHT</h5>
-                <p>Mã sinh viên: 2310900112<br>
-                    Lớp: K23CNT3<br>
-                    Địa chỉ: Hà Nội</p>
+                <p class="text-muted">
+                    Mua sắm tiện lợi, giao hàng nhanh chóng.
+                    Cam kết chất lượng sản phẩm 100%.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-2x"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-youtube fa-2x"></i></a>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h5><i class="fas fa-link"></i> Liên kết</h5>
+
+            <!-- Quick Links -->
+            <div class="col-md-3">
+                <h5>Liên kết nhanh</h5>
                 <ul class="list-unstyled">
-                    <li><a th:href="@{/}" class="text-white text-decoration-none">Trang chủ</a></li>
-                    <li><a th:href="@{/sanpham}" class="text-white text-decoration-none">Sản phẩm</a></li>
-                    <li><a th:href="@{/donhang/track}" class="text-white text-decoration-none">Tra cứu đơn hàng</a></li>
-                    <li><a th:href="@{/giohang}" class="text-white text-decoration-none">Giỏ hàng</a></li>
+                    <li><a th:href="@{/}" class="text-muted text-decoration-none">Trang chủ</a></li>
+                    <li><a th:href="@{/sanpham}" class="text-muted text-decoration-none">Sản phẩm</a></li>
+                    <li><a th:href="@{/about}" class="text-muted text-decoration-none">Giới thiệu</a></li>
+                    <li><a th:href="@{/contact}" class="text-muted text-decoration-none">Liên hệ</a></li>
+                    <li><a th:href="@{/donhang/track}" class="text-muted text-decoration-none">Tra cứu đơn hàng</a></li>
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h5><i class="fas fa-info-circle"></i> Hỗ trợ</h5>
-                <p><i class="fas fa-phone"></i> Hotline: 0328942958<br>
-                    <i class="fas fa-envelope"></i> Email: nht2310900112@gmail.com<br>
-                    <i class="fas fa-university"></i> MB Bank: 0328942958<br>
-                    <i class="fas fa-clock"></i> Giờ làm việc: 8:00 - 22:00</p>
+
+            <!-- Customer Support -->
+            <div class="col-md-3">
+                <h5>Hỗ trợ khách hàng</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-muted text-decoration-none">Chính sách đổi trả</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Chính sách vận chuyển</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Hướng dẫn mua hàng</a></li>
+                    <li><a href="#" class="text-muted text-decoration-none">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-md-3">
+                <h5>Liên hệ</h5>
+                <ul class="list-unstyled text-muted">
+                    <li><i class="fas fa-map-marker-alt"></i> Hà Nội, Việt Nam</li>
+                    <li><i class="fas fa-phone"></i> 0328.942.958</li>
+                    <li><i class="fas fa-envelope"></i> nht@nht.com</li>
+                    <li><i class="fas fa-clock"></i> 8:00 - 22:00 (Hàng ngày)</li>
+                </ul>
             </div>
         </div>
-        <hr class="bg-white">
-        <div class="text-center">
-            <p class="mb-0">© 2024 Tạp Hóa NHT - Nguyễn Hữu Tuấn. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script xmlns:th="http://www.w3.org/1999/xhtml" th:src="@{/js/main.js}"></script>
-</body>
+        <hr class="bg-secondary">
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn btn-primary position-fixed bottom-0 end-0 m-3"
+            style="display: none; z-index: 9999;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- ============================================ -->
+    <!-- CRITICAL: Bootstrap JavaScript Bundle -->
+    <!-- THIS IS REQUIRED FOR CAROUSEL TO WORK! -->
+    <!-- ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script th:src="@{/js/main.js}"></script>
+
+    <!-- Initialize Carousel (ensure it auto-plays) -->
+    <script>
+        // Force carousel to auto-play
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.getElementById('heroCarousel');
+            if (carousel) {
+                const bsCarousel = new bootstrap.Carousel(carousel, {
+                    interval: 4000,  // 4 seconds
+                    ride: 'carousel',
+                    pause: 'hover',
+                    wrap: true
+                });
+
+                console.log('Carousel initialized successfully!');
+            }
+
+            // Back to top button
+            const backToTopBtn = document.getElementById('backToTop');
+            if (backToTopBtn) {
+                window.addEventListener('scroll', function() {
+                    if (window.pageYOffset > 300) {
+                        backToTopBtn.style.display = 'block';
+                    } else {
+                        backToTopBtn.style.display = 'none';
+                    }
+                });
+
+                backToTopBtn.addEventListener('click', function() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+</footer>
 </html>
